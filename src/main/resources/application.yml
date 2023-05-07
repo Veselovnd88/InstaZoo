@@ -1,6 +1,12 @@
 server:
   port: 6666
 
+jwt:
+  secret: "c2VjcmV0LXNlY3JldA=="
+  prefix: "Bearer "
+  header: "Authorization"
+  expiration-time: 600000
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
