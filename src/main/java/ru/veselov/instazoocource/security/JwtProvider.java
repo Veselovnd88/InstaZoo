@@ -1,8 +1,9 @@
 package ru.veselov.instazoocource.security;
 
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,29 @@ public class JwtProvider {
                 .compact();
     }
 
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getKey(jwtProperties.getSecret())).build()
+                    .parse(token);
+            log.info("Jwt successfully parsed");
+            return true;
+        } catch (SignatureException |
+                 MalformedJwtException |
+                 ExpiredJwtException |
+                 UnsupportedJwtException |
+                 IllegalArgumentException exception) {
+            log.error("Error occurred [{}]", exception.getMessage());
+            return false;
+        }
+    }
+
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(jwtProperties.getSecret())).build()
+                .parseClaimsJws(token).getBody();
+        String id = claims.get("id", String.class);
+        return Long.parseLong(id);
+    }
 
     private Key getKey(String secret) {
         //converting key from application.yml
