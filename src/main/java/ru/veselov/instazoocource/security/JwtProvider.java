@@ -63,6 +63,7 @@ public class JwtProvider {
         Claims claims = Jwts.parserBuilder().setSigningKey(getKey(jwtProperties.getSecret())).build()
                 .parseClaimsJws(token).getBody();
         String id = claims.get("id", String.class);
+        log.info("Retrieved [id {}] from jwt", id);
         return Long.parseLong(id);
     }
 
