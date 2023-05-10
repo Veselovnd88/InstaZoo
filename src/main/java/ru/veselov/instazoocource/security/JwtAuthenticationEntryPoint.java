@@ -27,4 +27,5 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.getWriter().println(jsonLoginResponse);
         log.error("Invalid authentication data");
     }
+
 }
