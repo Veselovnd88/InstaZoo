@@ -13,7 +13,6 @@ import ru.veselov.instazoocource.annotations.ValidEmail;
 public class SignUpRequest {
     @Email(message = "Field should have e-mail format")
     @NotBlank
-    @ValidEmail
     private String email;
 
     @NotEmpty(message = "Please enter your name")

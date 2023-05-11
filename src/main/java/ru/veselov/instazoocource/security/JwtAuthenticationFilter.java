@@ -37,6 +37,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         String jwt = getJwtFromRequest(request);
+        if (jwt == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (StringUtils.isNotBlank(jwt) && jwtProvider.validateToken(jwt)) {
             Long userId = jwtProvider.getUserIdFromToken(jwt);
             User userDetails = userDetailsService.loadUserById(userId);
