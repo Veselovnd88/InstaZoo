@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final CustomUserDetailsService userDetailsService;
 
-    private final JwtProperties jwtProperties;
+    private final SecurityProperties securityProperties;
 
     @Override
     protected void doFilterInternal(
@@ -55,9 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
-        String bearToken = request.getHeader(jwtProperties.getHeader());
-        if (StringUtils.isNotBlank(bearToken) && bearToken.startsWith(jwtProperties.getPrefix())) {
-            return bearToken.substring(jwtProperties.getPrefix().length());
+        String bearToken = request.getHeader(securityProperties.getHeader());
+        if (StringUtils.isNotBlank(bearToken) && bearToken.startsWith(securityProperties.getPrefix())) {
+            return bearToken.substring(securityProperties.getPrefix().length());
         }
         return null;
     }

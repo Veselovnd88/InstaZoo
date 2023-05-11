@@ -1,7 +1,7 @@
 server:
   port: 6666
 
-jwt:
+security:
   secret: "c2VjcmV0LXNlY3JldA=="
   prefix: "Bearer "
   header: "Authorization"

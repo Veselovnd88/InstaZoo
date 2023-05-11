@@ -6,10 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "jwt")
+@ConfigurationProperties(prefix = "security")
 @Getter
 @Setter
-public class JwtProperties {
+public class SecurityProperties {
 
     private String secret;
 

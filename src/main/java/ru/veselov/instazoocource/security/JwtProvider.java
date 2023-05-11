@@ -20,12 +20,12 @@ import java.util.Map;
 @Slf4j
 public class JwtProvider {
 
-    private final JwtProperties jwtProperties;
+    private final SecurityProperties securityProperties;
 
     public String generateToken(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         Date now = new Date(System.currentTimeMillis());
-        Date expired = new Date(now.getTime() + jwtProperties.getExpirationTime());
+        Date expired = new Date(now.getTime() + securityProperties.getExpirationTime());
         String userId = user.getId().toString();
 
         Map<String, Object> claimsMap = new HashMap<>();
@@ -38,14 +38,14 @@ public class JwtProvider {
                 .addClaims(claimsMap)
                 .setIssuedAt(now)
                 .setExpiration(expired)
-                .signWith(getKey(jwtProperties.getSecret()))
+                .signWith(getKey(securityProperties.getSecret()))
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(getKey(jwtProperties.getSecret())).build()
+                    .setSigningKey(getKey(securityProperties.getSecret())).build()
                     .parse(token);
             log.info("Jwt successfully parsed");
             return true;
@@ -60,7 +60,7 @@ public class JwtProvider {
     }
 
     public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(jwtProperties.getSecret())).build()
+        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(securityProperties.getSecret())).build()
                 .parseClaimsJws(token).getBody();
         String id = claims.get("id", String.class);
         log.info("Retrieved [id {}] from jwt", id);
