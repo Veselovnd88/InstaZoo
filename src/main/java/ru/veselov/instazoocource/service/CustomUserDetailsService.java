@@ -9,7 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.veselov.instazoocource.entity.User;
+import ru.veselov.instazoocource.entity.UserEntity;
+import ru.veselov.instazoocource.mapper.UserMapper;
+import ru.veselov.instazoocource.model.User;
 import ru.veselov.instazoocource.repository.UserRepository;
 
 import java.util.List;
@@ -22,9 +24,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    private final UserMapper userMapper;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findUserByEmail(username)
+        UserEntity user = userRepository.findUserByEmail(username)
                 .orElseThrow(
                         () -> {
                             log.error("No such user with [username {}", username);
@@ -36,7 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return buildUserDetails(user);
     }
 
-    public User loadUserById(Long id) {
+    public UserEntity loadUserById(Long id) {
         return userRepository.findUserById(id).orElseThrow(
                 () -> {
                     log.error("No such user found with [id {}", id);
@@ -46,16 +50,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         );
     }
 
-    public static User buildUserDetails(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
+    public User buildUserDetails(UserEntity userEntity) {
+        List<GrantedAuthority> authorities = userEntity.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());
-        return new User(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPassword(),
-                authorities
-        );
+        User user = userMapper.entityToUser(userEntity);
+        user.setAuthorities(authorities);
+        return user;
     }
+
 }

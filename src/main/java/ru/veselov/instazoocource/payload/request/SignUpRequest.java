@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.veselov.instazoocource.annotations.PasswordMatches;
-import ru.veselov.instazoocource.annotations.ValidEmail;
 
 @Data
 @PasswordMatches

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import ru.veselov.instazoocource.entity.User;
+import ru.veselov.instazoocource.entity.UserEntity;
 
 import java.security.Key;
 import java.util.Date;
@@ -18,12 +18,13 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class JwtProvider {
+public class
+JwtProvider {
 
     private final SecurityProperties securityProperties;
 
     public String generateToken(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        UserEntity user = (UserEntity) authentication.getPrincipal();
         Date now = new Date(System.currentTimeMillis());
         Date expired = new Date(now.getTime() + securityProperties.getExpirationTime());
         String userId = user.getId().toString();

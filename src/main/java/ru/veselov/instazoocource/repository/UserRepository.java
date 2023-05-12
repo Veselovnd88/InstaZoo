@@ -2,17 +2,17 @@ package ru.veselov.instazoocource.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.veselov.instazoocource.entity.User;
+import ru.veselov.instazoocource.entity.UserEntity;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    Optional<User> findUserByUsername(String username);
+    Optional<UserEntity> findUserByUsername(String username);
 
-    Optional<User> findUserByEmail(String email);
+    Optional<UserEntity> findUserByEmail(String email);
 
-    Optional<User> findUserById(Long id);
+    Optional<UserEntity> findUserById(Long id);
 
 }

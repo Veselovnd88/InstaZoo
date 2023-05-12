@@ -4,7 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import ru.veselov.instazoocource.entity.User;
+import ru.veselov.instazoocource.entity.UserEntity;
+import ru.veselov.instazoocource.model.User;
 import ru.veselov.instazoocource.payload.request.SignUpRequest;
 
 @Mapper(componentModel = "spring")
@@ -12,6 +13,10 @@ import ru.veselov.instazoocource.payload.request.SignUpRequest;
 public interface UserMapper {
 
     @Mapping(target = "password", ignore = true)
-    User signUpToUser(SignUpRequest sign);
+    UserEntity signUpToUser(SignUpRequest sign);
+
+    @Mapping(target = "authorities", ignore = true)
+    @Mapping(target = "posts", ignore = true)
+    User entityToUser(UserEntity userEntity);
 
 }

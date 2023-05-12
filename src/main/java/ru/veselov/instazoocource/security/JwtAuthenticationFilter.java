@@ -14,11 +14,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.veselov.instazoocource.entity.User;
+import ru.veselov.instazoocource.entity.UserEntity;
 import ru.veselov.instazoocource.service.CustomUserDetailsService;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -36,14 +37,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String jwt = getJwtFromRequest(request);
-        if (jwt == null) {
+        Optional<String> jwtOpt = getJwtFromRequest(request);
+        if (jwtOpt.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
+        String jwt = jwtOpt.get();
         if (StringUtils.isNotBlank(jwt) && jwtProvider.validateToken(jwt)) {
             Long userId = jwtProvider.getUserIdFromToken(jwt);
-            User userDetails = userDetailsService.loadUserById(userId);
+            UserEntity userDetails = userDetailsService.loadUserById(userId);
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     userDetails, null, Collections.emptyList()
@@ -58,11 +60,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getJwtFromRequest(HttpServletRequest request) {
+    private Optional<String> getJwtFromRequest(HttpServletRequest request) {
         String bearToken = request.getHeader(securityProperties.getHeader());
         if (StringUtils.isNotBlank(bearToken) && bearToken.startsWith(securityProperties.getPrefix())) {
-            return bearToken.substring(securityProperties.getPrefix().length());
+            return
+                    Optional.of(bearToken.substring(securityProperties.getPrefix().length()));
         }
-        return null;
+        return Optional.empty();
     }
+
 }

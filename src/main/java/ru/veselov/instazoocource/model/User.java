@@ -1,40 +1,40 @@
-package ru.veselov.instazoocource.entity;
+package ru.veselov.instazoocource.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.veselov.instazoocource.entity.enums.ERole;
+import ru.veselov.instazoocource.entity.Post;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-@Entity
 @Data
-@EqualsAndHashCode(exclude = {"roles", "posts"}, callSuper = false)
+@EqualsAndHashCode(exclude = {"posts"})
 @NoArgsConstructor
-@Table(name = "zoo_user")
-public class User extends BaseEntity implements UserDetails {
+public class User implements UserDetails {
 
-    @Column(name = "name", nullable = false)
+    private Long id;
+
     private String name;
-    @Column(name = "username", unique = true, updatable = false)//uniqiue field, and we cannot update it
-    private String username;
-    @Column(name = "lastname", nullable = false)
-    private String lastname;
-    @Column(name = "email", unique = true)
-    private String email;
-    @Column(name = "bio", columnDefinition = "text")
-    private String bio;
-    @Column(name = "password", length = 3000)// for encryption
-    private String password;
-    @ElementCollection(targetClass = ERole.class)
-    @CollectionTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"))
-    private Set<ERole> roles = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    private String username;
+
+    private String lastname;
+
+    private String email;
+
+    private String bio;
+
+    private String password;
+
+    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
     private List<Post> posts = new ArrayList<>();
 
     public User(Long id,
@@ -42,14 +42,13 @@ public class User extends BaseEntity implements UserDetails {
                 String email,
                 String password,
                 Collection<? extends GrantedAuthority> authorities) {
-        super(id);
+        this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
 
-    @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
     @Override
@@ -77,4 +76,5 @@ public class User extends BaseEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
