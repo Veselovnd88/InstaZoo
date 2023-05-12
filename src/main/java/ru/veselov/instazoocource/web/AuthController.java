@@ -13,7 +13,7 @@ import ru.veselov.instazoocource.payload.response.AuthResponseDTO;
 import ru.veselov.instazoocource.payload.response.ResponseMessage;
 import ru.veselov.instazoocource.service.AuthenticationService;
 import ru.veselov.instazoocource.service.UserService;
-import ru.veselov.instazoocource.validation.ResponseErrorValidation;
+import ru.veselov.instazoocource.validation.impl.FieldErrorResponseServiceImpl;
 
 @CrossOrigin
 @RestController
@@ -24,13 +24,13 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
 
-    private final ResponseErrorValidation responseErrorValidation;
+    private final FieldErrorResponseServiceImpl fieldErrorResponseService;
 
     private final UserService userService;
 
     @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest login, BindingResult result) {
-        responseErrorValidation.validateFields(result);
+        fieldErrorResponseService.validateFields(result);
         AuthResponseDTO auth = authenticationService.authenticate(login);
         return new ResponseEntity<>(auth, HttpStatus.ACCEPTED);
     }
@@ -38,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpRequest sign, BindingResult result) {
-        responseErrorValidation.validateFields(result);
+        fieldErrorResponseService.validateFields(result);
         userService.createUser(sign);
         return new ResponseEntity<>(new ResponseMessage("User successfully registered"), HttpStatus.CREATED);
     }

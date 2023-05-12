@@ -8,11 +8,11 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-public class ErrorResponse implements Serializable {
+public class ErrorResponse<T> implements Serializable {
     private String error;
-    private String message;
+
+    private T message;
 
     private HttpStatus httpStatus;
-
 
 }
