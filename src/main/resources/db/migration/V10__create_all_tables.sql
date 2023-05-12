@@ -52,7 +52,7 @@ create table zoo_user
     bio        text,
     email      varchar(255),
     lastname   varchar(255) not null,
-    name       varchar(255) not null,
+    firstname       varchar(255) not null,
     password   varchar(3000),
     username   varchar(255),
     primary key (id)

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.veselov.instazoocource.payload.request.LoginRequest;
@@ -31,10 +30,7 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest login, BindingResult result) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(result);
-        if (!ObjectUtils.isEmpty(errors)) {
-            return errors;
-        }
+        responseErrorValidation.validateFields(result);
         AuthResponseDTO auth = authenticationService.authenticate(login);
         return new ResponseEntity<>(auth, HttpStatus.ACCEPTED);
     }
@@ -42,10 +38,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpRequest sign, BindingResult result) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(result);//TODO throw exception
-        if (!ObjectUtils.isEmpty(errors)) {
-            return errors;
-        }
+        responseErrorValidation.validateFields(result);
         userService.createUser(sign);
         return new ResponseEntity<>(new ResponseMessage("User successfully registered"), HttpStatus.CREATED);
     }

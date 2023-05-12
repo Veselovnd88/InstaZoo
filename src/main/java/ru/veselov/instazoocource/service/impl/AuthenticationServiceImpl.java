@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.veselov.instazoocource.payload.request.LoginRequest;
 import ru.veselov.instazoocource.payload.response.AuthResponseDTO;
 import ru.veselov.instazoocource.security.JwtProvider;
-import ru.veselov.instazoocource.security.SecurityConstants;
 import ru.veselov.instazoocource.security.SecurityProperties;
 import ru.veselov.instazoocource.service.AuthenticationService;
 
@@ -30,8 +30,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 login.getUsername(),
                 login.getPassword()
         );
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-        String jwt = securityProperties.getPrefix() + jwtProvider.generateToken(authToken);
+        Authentication authenticate = authenticationManager.authenticate(authToken);
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String jwt = securityProperties.getPrefix() + jwtProvider.generateToken(authenticate);
         log.info("[User {}] authenticated", login.getUsername());
         return new AuthResponseDTO(true, jwt);
     }

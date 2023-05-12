@@ -2,7 +2,7 @@ server:
   port: 6666
 
 security:
-  secret: "c2VjcmV0LXNlY3JldA=="
+  secret: "D9D323C5E55F45C206D7880329B1721A4334C00F336E5F2F1E9DAB745FF44837"
   prefix: "Bearer "
   header: "Authorization"
   expiration-time: 600000

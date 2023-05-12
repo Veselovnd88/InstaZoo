@@ -15,8 +15,8 @@ import java.util.*;
 @Table(name = "zoo_user")
 public class UserEntity extends BaseEntity {
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "firstname", nullable = false)
+    private String firstname;
     @Column(name = "username", unique = true, updatable = false)//uniqiue field, and we cannot update it
     private String username;
     @Column(name = "lastname", nullable = false)

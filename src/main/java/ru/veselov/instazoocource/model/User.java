@@ -20,7 +20,7 @@ public class User implements UserDetails {
 
     private Long id;
 
-    private String name;
+    private String firstname;
 
     private String username;
 
@@ -36,18 +36,6 @@ public class User implements UserDetails {
     private LocalDateTime createdAt;
 
     private List<Post> posts = new ArrayList<>();
-
-    public User(Long id,
-                String username,
-                String email,
-                String password,
-                Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-    }
 
     private Collection<? extends GrantedAuthority> authorities;
 

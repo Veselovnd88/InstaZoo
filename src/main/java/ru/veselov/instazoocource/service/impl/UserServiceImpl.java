@@ -29,9 +29,9 @@ public class UserServiceImpl implements UserService {
         String username = signUp.getUsername();
         Optional<UserEntity> userByUsername = userRepository.findUserByUsername(username);
         if (userByUsername.isPresent()) {
-            log.error("User with this [username {}] already exists", userByUsername);
+            log.error("User with this [username {}] already exists", signUp.getUsername());
             throw new UserAlreadyExistsException(
-                    String.format("User with this [username %s] already exists", userByUsername));
+                    String.format("User with this [username %s] already exists", signUp.getUsername()));
         }
         UserEntity user = userMapper.signUpToUser(signUp);
         user.setPassword(passwordEncoder.encode(signUp.getPassword()));

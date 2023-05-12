@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import ru.veselov.instazoocource.payload.response.InvalidLoginResponse;
+import ru.veselov.instazoocource.exception.error.ErrorConstants;
+import ru.veselov.instazoocource.exception.error.ErrorResponse;
 
 import java.io.IOException;
 
@@ -20,12 +21,15 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        InvalidLoginResponse loginResponse = new InvalidLoginResponse();
-        String jsonLoginResponse = new Gson().toJson(loginResponse);
+        ErrorResponse errorResponse = new ErrorResponse(
+                ErrorConstants.ERROR_NOT_AUTHORIZED,
+                "Invalid login or password",
+                HttpStatus.UNAUTHORIZED);
+        String jsonLoginResponse = new Gson().toJson(errorResponse);
         response.setContentType(SecurityConstants.CONTENT_TYPE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().println(jsonLoginResponse);
-        log.error("Invalid authentication data");
+        log.error("Invalid credentials data [{}]", authException.getMessage());
     }
 
 }

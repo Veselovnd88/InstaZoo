@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            log.info("Authentication set for [user {}]", userDetails.getName());
+            log.info("Authentication set for [user {}]", userDetails.getUsername());
         } else {
             log.error("Cannot authenticate user with [{}]", jwt);
             throw new JwtException("Cannot authenticate user");

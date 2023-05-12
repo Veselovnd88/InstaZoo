@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import ru.veselov.instazoocource.entity.UserEntity;
+import ru.veselov.instazoocource.model.User;
 
 import java.security.Key;
 import java.util.Date;
@@ -24,7 +24,7 @@ JwtProvider {
     private final SecurityProperties securityProperties;
 
     public String generateToken(Authentication authentication) {
-        UserEntity user = (UserEntity) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
         Date now = new Date(System.currentTimeMillis());
         Date expired = new Date(now.getTime() + securityProperties.getExpirationTime());
         String userId = user.getId().toString();
@@ -32,7 +32,7 @@ JwtProvider {
         Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("id", userId);
         claimsMap.put("username", user.getUsername());
-        claimsMap.put("firstname", user.getName());
+        claimsMap.put("firstname", user.getFirstname());
         claimsMap.put("lastname", user.getLastname());
         return Jwts.builder()
                 .setSubject(userId)
@@ -46,8 +46,7 @@ JwtProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(getKey(securityProperties.getSecret())).build()
-                    .parse(token);
+                    .setSigningKey(getKey(securityProperties.getSecret())).build().parseClaimsJws(token).getBody();
             log.info("Jwt successfully parsed");
             return true;
         } catch (SignatureException |

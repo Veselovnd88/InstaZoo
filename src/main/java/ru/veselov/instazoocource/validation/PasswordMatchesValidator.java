@@ -9,12 +9,12 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
 
     @Override
     public void initialize(PasswordMatches constraintAnnotation) {
+        ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         SignUpRequest signUpRequest = (SignUpRequest) value;
-
         return signUpRequest.getPassword().equals(((SignUpRequest) value).getConfirmPassword());
     }
 
