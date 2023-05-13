@@ -24,7 +24,7 @@ public class ApiExceptionHandler {
     @ResponseBody
     public ErrorResponse<Map<String, String>> handleValidationException(CustomValidationException exception) {
         return new ErrorResponse<>(
-                ErrorConstants.ERROR_BAD_REQUEST,
+                ErrorConstants.ERROR_VALIDATION,
                 exception.getValidationMap(),
                 HttpStatus.BAD_REQUEST);
     }

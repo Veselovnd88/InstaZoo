@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -40,17 +40,19 @@ public class CustomUserDetailsService implements UserDetailsService {
         return buildUserDetails(user);
     }
 
-    public UserEntity loadUserById(Long id) {
-        return userRepository.findUserById(id).orElseThrow(
+    public User loadUserById(Long id) {
+        UserEntity userEntity = userRepository.findUserById(id).orElseThrow(
                 () -> {
                     log.error("No such user found with [id {}", id);
                     throw new EntityNotFoundException(
                             String.format("No such user with [id %s]", id));
                 }
         );
+        log.info("Retrieving [User {}] from repo", id);
+        return buildUserDetails(userEntity);
     }
 
-    public User buildUserDetails(UserEntity userEntity) {
+    private User buildUserDetails(UserEntity userEntity) {
         List<GrantedAuthority> authorities = userEntity.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());

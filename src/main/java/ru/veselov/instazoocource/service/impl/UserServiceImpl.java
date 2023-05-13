@@ -2,7 +2,7 @@ package ru.veselov.instazoocource.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.instazoocource.entity.UserEntity;
@@ -23,24 +23,30 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
 
     @Transactional
-    public UserEntity createUser(SignUpRequest signUp) {
+    public void createUser(SignUpRequest signUp) {
         String username = signUp.getUsername();
         Optional<UserEntity> userByUsername = userRepository.findUserByUsername(username);
-        if (userByUsername.isPresent()) {
-            log.error("User with this [username {}] already exists", signUp.getUsername());
+        Optional<UserEntity> userByEmail = userRepository.findUserByEmail(signUp.getEmail());
+        if (userByUsername.isPresent() || userByEmail.isPresent()) {
+            log.error(
+                    "User with this [username {} or email {}] already exists",
+                    signUp.getUsername(),
+                    signUp.getEmail());
             throw new UserAlreadyExistsException(
-                    String.format("User with this [username %s] already exists", signUp.getUsername()));
+                    String.format("User with this [username %s or email %s] already exists",
+                            signUp.getUsername(),
+                            signUp.getEmail()));
         }
         UserEntity user = userMapper.signUpToUser(signUp);
         user.setPassword(passwordEncoder.encode(signUp.getPassword()));
         user.getRoles().add(ERole.ROLE_USER);
-        log.info("User with [username {}] successfully created", username);
-        return userRepository.save(user);
+        userRepository.save(user);
+        log.info("User with [username {}] successfully created and saved", username);
     }
 
 }

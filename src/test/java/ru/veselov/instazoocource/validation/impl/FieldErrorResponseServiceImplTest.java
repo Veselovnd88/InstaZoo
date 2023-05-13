@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import ru.veselov.instazoocource.exception.CustomValidationException;
 
 import java.util.List;
@@ -32,16 +33,23 @@ class FieldErrorResponseServiceImplTest {
     void shouldThrowException() {
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getFieldErrors()).thenReturn(List.of(
-                        new FieldError("Object", "fieldOne", "messageOne"),
-                        new FieldError("Object", "fieldTwo", "messageTwo")
+                        new FieldError("FieldError", "fieldOne", "messageOne"),
+                        new FieldError("FieldError", "fieldTwo", "messageTwo")
                 )
         );
+        String[] codes = new String[]{"Error"};
+        when(bindingResult.getAllErrors()).thenReturn(List.of(
+                new ObjectError("Name", codes, null, "message3"),
+                new FieldError("FieldError", "fieldOne", "messageOne"),
+                new FieldError("FieldError", "fieldTwo", "messageTwo")
+        ));
         Assertions.assertThatThrownBy(() ->
                         fieldErrorResponseService.validateFields(bindingResult))
                 .isInstanceOf(CustomValidationException.class).hasMessageStartingWith("Wrong fields")
                 .hasFieldOrPropertyWithValue("validationMap", Map.of(
                                 "fieldOne", "messageOne",
-                                "fieldTwo", "messageTwo"
+                                "fieldTwo", "messageTwo",
+                                "Error", "message3"
                         )
                 );
     }

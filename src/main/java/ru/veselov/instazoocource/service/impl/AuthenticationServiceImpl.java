@@ -14,8 +14,8 @@ import ru.veselov.instazoocource.security.SecurityProperties;
 import ru.veselov.instazoocource.service.AuthenticationService;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final AuthenticationManager authenticationManager;

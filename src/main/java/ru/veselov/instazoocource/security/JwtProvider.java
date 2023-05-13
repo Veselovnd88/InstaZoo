@@ -1,6 +1,10 @@
 package ru.veselov.instazoocource.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -54,7 +58,7 @@ JwtProvider {
                  ExpiredJwtException |
                  UnsupportedJwtException |
                  IllegalArgumentException exception) {
-            log.error("Error occurred [{}]", exception.getMessage());
+            log.error("Error occurred during parsing Jwt [{}]", exception.getMessage());
             return false;
         }
     }
@@ -72,4 +76,5 @@ JwtProvider {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
 }

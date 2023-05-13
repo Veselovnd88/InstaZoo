@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.veselov.instazoocource.entity.UserEntity;
+import ru.veselov.instazoocource.model.User;
 import ru.veselov.instazoocource.service.CustomUserDetailsService;
 
 import java.io.IOException;
@@ -45,14 +45,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = jwtOpt.get();
         if (StringUtils.isNotBlank(jwt) && jwtProvider.validateToken(jwt)) {
             Long userId = jwtProvider.getUserIdFromToken(jwt);
-            UserEntity userDetails = userDetailsService.loadUserById(userId);
+            User user = userDetailsService.loadUserById(userId);
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, Collections.emptyList()
+                    user, null, Collections.emptyList()
             );
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            log.info("Authentication set for [user {}]", userDetails.getUsername());
+            log.info("Authentication set for [user {}]", user.getUsername());
         } else {
             log.error("Cannot authenticate user with [{}]", jwt);
             throw new JwtException("Cannot authenticate user");
