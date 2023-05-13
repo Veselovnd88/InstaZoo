@@ -14,7 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.instazoocource.payload.request.LoginRequest;
-import ru.veselov.instazoocource.payload.response.AuthResponseDTO;
+import ru.veselov.instazoocource.payload.response.AuthResponse;
 import ru.veselov.instazoocource.security.JwtProvider;
 import ru.veselov.instazoocource.security.SecurityProperties;
 import ru.veselov.instazoocource.util.Constants;
@@ -59,7 +59,7 @@ class AuthenticationServiceImplTest {
         LoginRequest loginRequest = UserUtils.getLoginRequest();
         when(jwtProvider.generateToken(ArgumentMatchers.any())).thenReturn("jwt");
 
-        AuthResponseDTO authResponse = authenticationService.authenticate(loginRequest);
+        AuthResponse authResponse = authenticationService.authenticate(loginRequest);
 
         verify(authenticationManager, times(1)).authenticate(tokenCaptor.capture());
         UsernamePasswordAuthenticationToken captured = tokenCaptor.getValue();

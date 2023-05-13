@@ -1,9 +1,9 @@
 package ru.veselov.instazoocource.service;
 
 import ru.veselov.instazoocource.payload.request.LoginRequest;
-import ru.veselov.instazoocource.payload.response.AuthResponseDTO;
+import ru.veselov.instazoocource.payload.response.AuthResponse;
 
 public interface AuthenticationService {
 
-    AuthResponseDTO authenticate(LoginRequest login);
+    AuthResponse authenticate(LoginRequest login);
 }

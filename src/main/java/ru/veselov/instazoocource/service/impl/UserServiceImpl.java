@@ -2,17 +2,21 @@ package ru.veselov.instazoocource.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.veselov.instazoocource.dto.UserDTO;
 import ru.veselov.instazoocource.entity.UserEntity;
 import ru.veselov.instazoocource.entity.enums.ERole;
 import ru.veselov.instazoocource.exception.UserAlreadyExistsException;
 import ru.veselov.instazoocource.mapper.UserMapper;
+import ru.veselov.instazoocource.model.User;
 import ru.veselov.instazoocource.payload.request.SignUpRequest;
 import ru.veselov.instazoocource.repository.UserRepository;
 import ru.veselov.instazoocource.service.UserService;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @Service
@@ -47,6 +51,34 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(ERole.ROLE_USER);
         userRepository.save(user);
         log.info("User with [username {}] successfully created and saved", username);
+    }
+
+    @Override
+    public User updateUser(UserDTO userDTO, Principal principal) {
+        UserEntity userFromPrincipal = getUserFromPrincipal(principal);
+        userFromPrincipal.setFirstname(userDTO.getFirstname());
+        userFromPrincipal.setLastname(userDTO.getLastname());
+        userFromPrincipal.setBio(userDTO.getBio());
+        UserEntity saved = userRepository.save(userFromPrincipal);
+        return userMapper.entityToUser(saved);
+    }
+
+    @Override
+    public User getCurrentUser(Principal principal) {
+        UserEntity userFromPrincipal = getUserFromPrincipal(principal);
+        return userMapper.entityToUser(userFromPrincipal);
+    }
+
+    private UserEntity getUserFromPrincipal(Principal principal) {
+        String username = principal.getName();
+        return userRepository.findUserByUsername(username).orElseThrow(
+                () -> {
+                    log.error("User with such [username {}] not found", username);
+                    throw new UsernameNotFoundException(
+                            String.format("User with such [username %s] not found", username)
+                    );
+                }
+        );
     }
 
 }

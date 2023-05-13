@@ -1,5 +1,6 @@
 package ru.veselov.instazoocource.util;
 
+import ru.veselov.instazoocource.dto.UserDTO;
 import ru.veselov.instazoocource.entity.UserEntity;
 import ru.veselov.instazoocource.entity.enums.ERole;
 import ru.veselov.instazoocource.payload.request.LoginRequest;
@@ -34,5 +35,15 @@ public class UserUtils {
         loginRequest.setPassword(Constants.PASSWORD);
         loginRequest.setUsername(Constants.USERNAME);
         return loginRequest;
+    }
+
+    public static UserDTO getUserDTO() {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFirstname("Changed " + Constants.FIRST_NAME);
+        userDTO.setUsername(Constants.USERNAME);
+        userDTO.setLastname("Changed " + Constants.LAST_NAME);
+        userDTO.setId(Constants.USER_ID);
+        userDTO.setBio(Constants.BIO);
+        return userDTO;
     }
 }

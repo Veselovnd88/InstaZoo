@@ -9,7 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.veselov.instazoocource.payload.request.LoginRequest;
 import ru.veselov.instazoocource.payload.request.SignUpRequest;
-import ru.veselov.instazoocource.payload.response.AuthResponseDTO;
+import ru.veselov.instazoocource.payload.response.AuthResponse;
 import ru.veselov.instazoocource.payload.response.ResponseMessage;
 import ru.veselov.instazoocource.service.AuthenticationService;
 import ru.veselov.instazoocource.service.UserService;
@@ -31,7 +31,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest login, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
-        AuthResponseDTO auth = authenticationService.authenticate(login);
+        AuthResponse auth = authenticationService.authenticate(login);
         return new ResponseEntity<>(auth, HttpStatus.ACCEPTED);
     }
 

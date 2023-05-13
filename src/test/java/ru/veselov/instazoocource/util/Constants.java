@@ -17,4 +17,8 @@ public class Constants {
     public static String PASSWORD = "Wuff-Wuff";
 
     public static String EMAIL = "wanttoeat@meat.com";
+
+    public static String BIO = "I am happy dog";
+
+    public static Long USER_ID = 1L;
 }
