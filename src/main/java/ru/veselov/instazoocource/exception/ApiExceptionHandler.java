@@ -1,5 +1,6 @@
 package ru.veselov.instazoocource.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.veselov.instazoocource.exception.error.ErrorConstants;
 import ru.veselov.instazoocource.exception.error.ErrorResponse;
 
+import javax.naming.AuthenticationException;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -27,6 +29,19 @@ public class ApiExceptionHandler {
                 ErrorConstants.ERROR_VALIDATION,
                 exception.getValidationMap(),
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseBody
+    public ErrorResponse<String> handleEntityNotFoundException(RuntimeException exception) {
+        return new ErrorResponse<>(ErrorConstants.ERROR_NOT_FOUND, exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    public ErrorResponse<String> handleAuthenticationException(RuntimeException exception) {
+        return new ErrorResponse<>(ErrorConstants.ERROR_NOT_FOUND, exception.getMessage(),
+                HttpStatus.NOT_FOUND);
     }
 
 }

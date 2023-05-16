@@ -11,4 +11,7 @@ public class ErrorConstants {
     public static final String ERROR_CONFLICT = "error.conflict";
 
     public static final String ERROR_VALIDATION = "error.validation";
+
+    public static final String ERROR_NOT_FOUND = "error.not.found";
+
 }

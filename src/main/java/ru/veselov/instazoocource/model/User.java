@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.veselov.instazoocource.entity.Post;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

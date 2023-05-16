@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(UserDTO userDTO, Principal principal) {
-        UserEntity userFromPrincipal = getUserFromPrincipal(principal);
+        UserEntity userFromPrincipal = getUserByPrincipal(principal);
         userFromPrincipal.setFirstname(userDTO.getFirstname());
         userFromPrincipal.setLastname(userDTO.getLastname());
         userFromPrincipal.setBio(userDTO.getBio());
@@ -65,11 +65,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getCurrentUser(Principal principal) {
-        UserEntity userFromPrincipal = getUserFromPrincipal(principal);
+        UserEntity userFromPrincipal = getUserByPrincipal(principal);
         return userMapper.entityToUser(userFromPrincipal);
     }
 
-    private UserEntity getUserFromPrincipal(Principal principal) {
+    public UserEntity getUserByPrincipal(Principal principal) {
         String username = principal.getName();
         return userRepository.findUserByUsername(username).orElseThrow(
                 () -> {
