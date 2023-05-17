@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.instazoo.dto.PostDTO;
+import ru.veselov.instazoo.entity.ImageEntity;
 import ru.veselov.instazoo.entity.PostEntity;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.exception.PostNotFoundException;
@@ -12,7 +13,6 @@ import ru.veselov.instazoo.mapper.PostMapper;
 import ru.veselov.instazoo.model.Post;
 import ru.veselov.instazoo.repository.ImageRepository;
 import ru.veselov.instazoo.repository.PostRepository;
-import ru.veselov.instazoo.repository.UserRepository;
 import ru.veselov.instazoo.service.PostService;
 import ru.veselov.instazoo.service.UserService;
 
@@ -25,8 +25,6 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @Slf4j
 public class PostServiceImpl implements PostService {
-
-    private final UserRepository userRepository;
 
     private final UserService userService;
 
@@ -50,25 +48,22 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getAllPosts() {
+        log.info("Retrieving all posts from repository");
         return postMapper.entitiesToPosts(postRepository.findAllByOrderByCreatedAtDesc());
     }
 
     @Override
-    public Post getPostById(Long id, Principal principal) {
-        UserEntity foundUser = userService.getUserByPrincipal(principal);
-        Optional<PostEntity> foundPost = postRepository.findPostByIdAndUser(id, foundUser);
-        PostEntity post = foundPost.orElseThrow(() -> {
-            log.error("[Post with id {} and user {}] not found", id, principal.getName());
-            throw new PostNotFoundException(
-                    String.format("[Post with id %s and user %s] not found", id, principal.getName()));
-        });
-        return postMapper.entityToPost(post);
+    public Post getPostById(Long postId, Principal principal) {
+        PostEntity postEntity = getPostByIdAndPrincipal(postId, principal);
+        log.info("Retrieving [post {} of user {}]", postId, principal.getName());
+        return postMapper.entityToPost(postEntity);
     }
 
     @Override
     public List<Post> getAllPostsForUser(Principal principal) {
         UserEntity foundUser = userService.getUserByPrincipal(principal);
         List<PostEntity> posts = postRepository.findAllByUserOrderByCreatedAtDesc(foundUser);
+        log.info("Retrieving all posts of [user {}]", principal.getName());
         return postMapper.entitiesToPosts(posts);
     }
 
@@ -85,12 +80,35 @@ public class PostServiceImpl implements PostService {
         if (likedUser.isPresent()) {
             post.getLikedUsers().remove(username);
             post.setLikes(post.getLikes() - 1);
+            log.info("Like of [user {}] removed from [post {}]", username, postId);
         } else {
             post.getLikedUsers().add(username);
             post.setLikes(post.getLikes() + 1);
+            log.info("Like of [user {}] added to [post {}]", username, postId);
         }
         PostEntity saved = postRepository.save(post);
+        log.info("[Post {}] with new number of likes saved", postId);
         return postMapper.entityToPost(saved);
+    }
+
+    @Override
+    @Transactional
+    public void deletePost(Long postId, Principal principal) {
+        PostEntity postEntity = getPostByIdAndPrincipal(postId, principal);
+        Optional<ImageEntity> imageOptional = imageRepository.findByPostId(postEntity.getId());
+        postRepository.delete(postEntity);
+        imageOptional.ifPresent(imageRepository::delete);
+        log.info("[Post {}] was deleted with image", postId);
+    }
+
+    private PostEntity getPostByIdAndPrincipal(Long postId, Principal principal) {
+        UserEntity foundUser = userService.getUserByPrincipal(principal);
+        Optional<PostEntity> foundPost = postRepository.findPostByIdAndUser(postId, foundUser);
+        return foundPost.orElseThrow(() -> {
+            log.error("[Post with id {} and user {}] not found", postId, principal.getName());
+            throw new PostNotFoundException(
+                    String.format("[Post with id %s and user %s] not found", postId, principal.getName()));
+        });
     }
 
 }

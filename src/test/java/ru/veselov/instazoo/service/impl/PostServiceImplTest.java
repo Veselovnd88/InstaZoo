@@ -4,10 +4,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.instazoo.dto.PostDTO;
+import ru.veselov.instazoo.entity.ImageEntity;
 import ru.veselov.instazoo.entity.PostEntity;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.exception.PostNotFoundException;
@@ -15,7 +21,6 @@ import ru.veselov.instazoo.mapper.PostMapper;
 import ru.veselov.instazoo.mapper.PostMapperImpl;
 import ru.veselov.instazoo.repository.ImageRepository;
 import ru.veselov.instazoo.repository.PostRepository;
-import ru.veselov.instazoo.repository.UserRepository;
 import ru.veselov.instazoo.service.UserService;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
@@ -24,14 +29,11 @@ import java.security.Principal;
 import java.util.Optional;
 
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceImplTest {
-
-    @Mock
-    UserRepository userRepository;
 
     @Mock
     UserService userService;
@@ -83,7 +85,7 @@ class PostServiceImplTest {
     void shouldReturnPostById() {
         UserEntity userEntity = TestUtils.getUserEntity();
         PostEntity postEntity = TestUtils.getPostEntity();
-        when(userService.getUserByPrincipal(ArgumentMatchers.any())).thenReturn(userEntity);
+        when(userService.getUserByPrincipal(principal)).thenReturn(userEntity);
         when(postRepository.findPostByIdAndUser(
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(UserEntity.class))
@@ -129,7 +131,7 @@ class PostServiceImplTest {
     @Test
     void shouldAddLikeAndLikedUser() {
         PostEntity postEntity = TestUtils.getPostEntity();
-        String newLikedUser = "User didn't like ot before";
+        String newLikedUser = "User didn't like it before";
         when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.of(postEntity));
         int likesBefore = postEntity.getLikes();
         postService.likePost(Constants.ANY_ID, newLikedUser);
@@ -160,6 +162,24 @@ class PostServiceImplTest {
         Assertions.assertThatThrownBy(() ->
                 postService.likePost(Constants.ANY_ID, Constants.USERNAME)
         ).isInstanceOf(PostNotFoundException.class);
+    }
+
+    @Test
+    void shouldDeletePostAndImage() {
+        UserEntity userEntity = TestUtils.getUserEntity();
+        PostEntity postEntity = TestUtils.getPostEntity();
+        when(userService.getUserByPrincipal(principal)).thenReturn(userEntity);
+        when(postRepository.findPostByIdAndUser(
+                ArgumentMatchers.anyLong(),
+                ArgumentMatchers.any(UserEntity.class))
+        ).thenReturn(Optional.of(postEntity));
+        ImageEntity imageEntity = new ImageEntity();
+        when(imageRepository.findByPostId(postEntity.getId())).thenReturn(Optional.of(imageEntity));
+
+        postService.deletePost(postEntity.getId(), principal);
+
+        verify(postRepository, times(1)).delete(postEntity);
+        verify(imageRepository, times(1)).delete(imageEntity);
     }
 
 }

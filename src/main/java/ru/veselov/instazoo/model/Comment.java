@@ -1,28 +1,26 @@
 package ru.veselov.instazoo.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.veselov.instazoo.entity.BaseEntity;
 import ru.veselov.instazoo.entity.PostEntity;
 
-@Data
-@EqualsAndHashCode(exclude = {"post"}, callSuper = false)
-@Entity
-@Table(name = "comment")
-public class Comment extends BaseEntity {
+import java.time.LocalDateTime;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+@Data
+public class Comment {
+
+    private Long id;
+
     private PostEntity post;
-    @Column(name = "username", nullable = false)
+
     private String username;
-    @Column(name = "user_id", nullable = false)
+
     private Long userId;
-    @Column(name = "message", columnDefinition = "text", nullable = false)
+
     private String message;
+
+    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
+    private LocalDateTime createdAt;
 
 }

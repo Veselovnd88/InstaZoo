@@ -10,7 +10,7 @@ create table comment
 );
 
 
-create table image_model
+create table image
 (
     id          bigserial    not null,
     created_at  timestamp(6),

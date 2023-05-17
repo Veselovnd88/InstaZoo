@@ -2,15 +2,15 @@ package ru.veselov.instazoo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.veselov.instazoo.entity.ImageModel;
+import ru.veselov.instazoo.entity.ImageEntity;
 
 import java.util.Optional;
 
 @Repository
-public interface ImageRepository extends JpaRepository<ImageModel, Long> {
+public interface ImageRepository extends JpaRepository<ImageEntity, Long> {
 
-    Optional<ImageModel> findByUserId(Long userId);
+    Optional<ImageEntity> findByUserId(Long userId);
 
-    Optional<ImageModel> findByPostId(Long postId);
+    Optional<ImageEntity> findByPostId(Long postId);
 
 }

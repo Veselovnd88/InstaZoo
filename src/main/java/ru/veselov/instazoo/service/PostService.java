@@ -17,4 +17,6 @@ public interface PostService {
 
     Post likePost(Long postId, String username);
 
+    void deletePost(Long postId, Principal principal);
+
 }

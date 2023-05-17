@@ -3,6 +3,7 @@ package ru.veselov.instazoo.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.minidev.json.annotate.JsonIgnore;
@@ -10,7 +11,8 @@ import net.minidev.json.annotate.JsonIgnore;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Entity
-public class ImageModel extends BaseEntity {
+@Table(name = "image")
+public class ImageEntity extends BaseEntity {
     @Column(nullable = false)
     private String name;
     @Lob
