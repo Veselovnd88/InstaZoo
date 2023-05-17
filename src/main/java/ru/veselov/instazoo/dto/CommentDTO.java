@@ -1,25 +1,20 @@
-package ru.veselov.instazoo.model;
+package ru.veselov.instazoo.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import ru.veselov.instazoo.entity.PostEntity;
 
 import java.time.LocalDateTime;
 
 @Data
-public class Comment {
+public class CommentDTO {
 
     private Long id;
 
-    private PostEntity post;
-
     private String username;
 
-    private Long userId;
-
+    @NotEmpty
     private String message;
-
-    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
-    private LocalDateTime createdAt;
 
 }
