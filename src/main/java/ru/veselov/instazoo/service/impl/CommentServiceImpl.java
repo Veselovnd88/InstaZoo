@@ -18,6 +18,7 @@ import ru.veselov.instazoo.repository.UserRepository;
 import ru.veselov.instazoo.service.CommentService;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,17 +39,26 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public Comment saveComment(Long postId, CommentDTO commentDTO, Principal principal) {
         UserEntity userEntity = getUserByPrincipal(principal);
-        Optional<PostEntity> foundPost = postRepository.findById(postId);
-        PostEntity post = foundPost.orElseThrow(() -> {
-            log.error("[Post with id {}] not found", postId);
-            throw new PostNotFoundException(
-                    String.format("[Post with id %s] not found", postId));
-        });
+        PostEntity post = getPostById(postId);
         CommentEntity commentEntity = commentMapper.dtoToEntity(commentDTO);
         commentEntity.setPost(post);
         commentEntity.setUserId(userEntity.getId());
         CommentEntity saved = commentRepository.save(commentEntity);
         return commentMapper.entityToComment(saved);
+    }
+
+    @Override
+    public List<Comment> getAllCommentsForPost(Long postId) {
+        PostEntity post = getPostById(postId);
+        List<CommentEntity> comments = commentRepository.findAllByPost(post);
+        return commentMapper.entitiesToComments(comments);
+    }
+
+    @Override
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Optional<CommentEntity> commentOptional = commentRepository.findById(commentId);
+        commentOptional.ifPresent(commentRepository::delete);
     }
 
     private UserEntity getUserByPrincipal(Principal principal) {
@@ -62,4 +72,14 @@ public class CommentServiceImpl implements CommentService {
                 }
         );
     }
+
+    private PostEntity getPostById(Long postId) {
+        Optional<PostEntity> foundPost = postRepository.findById(postId);
+        return foundPost.orElseThrow(() -> {
+            log.error("[Post with id {}] not found", postId);
+            throw new PostNotFoundException(
+                    String.format("[Post with id %s] not found", postId));
+        });
+    }
+
 }

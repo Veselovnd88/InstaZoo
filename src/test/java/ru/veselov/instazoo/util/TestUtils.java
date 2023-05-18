@@ -1,5 +1,6 @@
 package ru.veselov.instazoo.util;
 
+import ru.veselov.instazoo.dto.CommentDTO;
 import ru.veselov.instazoo.dto.PostDTO;
 import ru.veselov.instazoo.dto.UserDTO;
 import ru.veselov.instazoo.entity.CommentEntity;
@@ -78,5 +79,21 @@ public class TestUtils {
                 commentEntity
         ));
         return postEntity;
+    }
+
+    public static CommentDTO getCommentDTO() {
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setUsername(Constants.USERNAME);
+        commentDTO.setMessage(Constants.COMMENT_MESSAGE);
+        return commentDTO;
+    }
+
+    public static CommentEntity getCommentEntity() {
+        CommentEntity commentEntity = new CommentEntity();
+        commentEntity.setUserId(Constants.ANY_ID);
+        commentEntity.setPost(getPostEntity());
+        commentEntity.setMessage(Constants.COMMENT_MESSAGE);
+        commentEntity.setUsername(Constants.USERNAME);
+        return commentEntity;
     }
 }

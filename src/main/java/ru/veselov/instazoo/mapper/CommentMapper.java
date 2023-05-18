@@ -7,6 +7,8 @@ import ru.veselov.instazoo.dto.CommentDTO;
 import ru.veselov.instazoo.entity.CommentEntity;
 import ru.veselov.instazoo.model.Comment;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 @MapperConfig(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentMapper {
@@ -14,4 +16,6 @@ public interface CommentMapper {
     CommentEntity dtoToEntity(CommentDTO commentDTO);
 
     Comment entityToComment(CommentEntity commentEntity);
+
+    List<Comment> entitiesToComments(List<CommentEntity> entityList);
 }

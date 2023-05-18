@@ -26,4 +26,6 @@ public class Constants {
 
     public static final String POST_CAPTION = "Dog Caption";
     public static final String POST_LOC = "DogVille";
+
+    public static final String COMMENT_MESSAGE = "Hello I am Dog";
 }
