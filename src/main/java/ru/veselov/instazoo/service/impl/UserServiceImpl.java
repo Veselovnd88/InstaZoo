@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.entityToUser(userFromPrincipal);
     }
 
-    public UserEntity getUserByPrincipal(Principal principal) {
+    private UserEntity getUserByPrincipal(Principal principal) {
         String username = principal.getName();
         return userRepository.findUserByUsername(username).orElseThrow(
                 () -> {

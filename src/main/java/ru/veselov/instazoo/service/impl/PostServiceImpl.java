@@ -2,6 +2,7 @@ package ru.veselov.instazoo.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.instazoo.dto.PostDTO;
@@ -13,8 +14,8 @@ import ru.veselov.instazoo.mapper.PostMapper;
 import ru.veselov.instazoo.model.Post;
 import ru.veselov.instazoo.repository.ImageRepository;
 import ru.veselov.instazoo.repository.PostRepository;
+import ru.veselov.instazoo.repository.UserRepository;
 import ru.veselov.instazoo.service.PostService;
-import ru.veselov.instazoo.service.UserService;
 
 import java.security.Principal;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.Optional;
 @Slf4j
 public class PostServiceImpl implements PostService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     private final PostRepository postRepository;
 
@@ -37,7 +38,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Post createPost(PostDTO postDTO, Principal principal) {
-        UserEntity foundUserEntity = userService.getUserByPrincipal(principal);
+        UserEntity foundUserEntity = getUserByPrincipal(principal);
         PostEntity post = postMapper.toEntity(postDTO);
         post.setUser(foundUserEntity);
         post.setLikes(0);
@@ -61,7 +62,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getAllPostsForUser(Principal principal) {
-        UserEntity foundUser = userService.getUserByPrincipal(principal);
+        UserEntity foundUser = getUserByPrincipal(principal);
         List<PostEntity> posts = postRepository.findAllByUserOrderByCreatedAtDesc(foundUser);
         log.info("Retrieving all posts of [user {}]", principal.getName());
         return postMapper.entitiesToPosts(posts);
@@ -102,13 +103,25 @@ public class PostServiceImpl implements PostService {
     }
 
     private PostEntity getPostByIdAndPrincipal(Long postId, Principal principal) {
-        UserEntity foundUser = userService.getUserByPrincipal(principal);
+        UserEntity foundUser = getUserByPrincipal(principal);
         Optional<PostEntity> foundPost = postRepository.findPostByIdAndUser(postId, foundUser);
         return foundPost.orElseThrow(() -> {
             log.error("[Post with id {} and user {}] not found", postId, principal.getName());
             throw new PostNotFoundException(
                     String.format("[Post with id %s and user %s] not found", postId, principal.getName()));
         });
+    }
+
+    private UserEntity getUserByPrincipal(Principal principal) {
+        String username = principal.getName();
+        return userRepository.findUserByUsername(username).orElseThrow(
+                () -> {
+                    log.error("User with such [username {}] not found", username);
+                    throw new UsernameNotFoundException(
+                            String.format("User with such [username %s] not found", username)
+                    );
+                }
+        );
     }
 
 }

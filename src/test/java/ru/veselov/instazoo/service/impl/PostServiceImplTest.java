@@ -4,13 +4,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.instazoo.dto.PostDTO;
 import ru.veselov.instazoo.entity.ImageEntity;
@@ -21,22 +17,20 @@ import ru.veselov.instazoo.mapper.PostMapper;
 import ru.veselov.instazoo.mapper.PostMapperImpl;
 import ru.veselov.instazoo.repository.ImageRepository;
 import ru.veselov.instazoo.repository.PostRepository;
-import ru.veselov.instazoo.service.UserService;
+import ru.veselov.instazoo.repository.UserRepository;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 
 import java.security.Principal;
 import java.util.Optional;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceImplTest {
 
     @Mock
-    UserService userService;
+    UserRepository userRepository;
 
     @Mock
     PostRepository postRepository;
@@ -62,12 +56,13 @@ class PostServiceImplTest {
     void shouldCreatePost() {
         PostDTO postDTO = TestUtils.getPostDTO();
         UserEntity userEntity = TestUtils.getUserEntity();
-        when(userService.getUserByPrincipal(ArgumentMatchers.any())).thenReturn(userEntity);
+        when(principal.getName()).thenReturn(Constants.USERNAME);
+        when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
 
         postService.createPost(postDTO, principal);
 
         verify(postRepository, times(1)).save(postCaptor.capture());
-        verify(userService, times(1)).getUserByPrincipal(principal);
+        verify(userRepository, times(1)).findUserByUsername(ArgumentMatchers.anyString());
         PostEntity captured = postCaptor.getValue();
         Assertions.assertThat(captured.getLikes()).isZero();
         Assertions.assertThat(captured.getTitle()).isEqualTo(postDTO.getTitle());
@@ -85,7 +80,8 @@ class PostServiceImplTest {
     void shouldReturnPostById() {
         UserEntity userEntity = TestUtils.getUserEntity();
         PostEntity postEntity = TestUtils.getPostEntity();
-        when(userService.getUserByPrincipal(principal)).thenReturn(userEntity);
+        when(principal.getName()).thenReturn(Constants.USERNAME);
+        when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
         when(postRepository.findPostByIdAndUser(
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(UserEntity.class))
@@ -97,13 +93,14 @@ class PostServiceImplTest {
         verify(postRepository, times(1)).findPostByIdAndUser(
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(UserEntity.class));
-        verify(userService, times(1)).getUserByPrincipal(principal);
+        verify(userRepository, times(1)).findUserByUsername(ArgumentMatchers.anyString());
     }
 
     @Test
     void shouldThrowExceptionIfPostNoFound() {
         UserEntity userEntity = TestUtils.getUserEntity();
-        when(userService.getUserByPrincipal(ArgumentMatchers.any())).thenReturn(userEntity);
+        when(principal.getName()).thenReturn(Constants.USERNAME);
+        when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
         when(postRepository.findPostByIdAndUser(
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(UserEntity.class))
@@ -115,13 +112,14 @@ class PostServiceImplTest {
         verify(postRepository, times(1)).findPostByIdAndUser(
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(UserEntity.class));
-        verify(userService, times(1)).getUserByPrincipal(principal);
+        verify(userRepository, times(1)).findUserByUsername(ArgumentMatchers.anyString());
     }
 
     @Test
     void shouldReturnPostsForUser() {
         UserEntity userEntity = TestUtils.getUserEntity();
-        when(userService.getUserByPrincipal(ArgumentMatchers.any())).thenReturn(userEntity);
+        when(principal.getName()).thenReturn(Constants.USERNAME);
+        when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
 
         postService.getAllPostsForUser(principal);
 
@@ -168,7 +166,8 @@ class PostServiceImplTest {
     void shouldDeletePostAndImage() {
         UserEntity userEntity = TestUtils.getUserEntity();
         PostEntity postEntity = TestUtils.getPostEntity();
-        when(userService.getUserByPrincipal(principal)).thenReturn(userEntity);
+        when(principal.getName()).thenReturn(Constants.USERNAME);
+        when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
         when(postRepository.findPostByIdAndUser(
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(UserEntity.class))
@@ -180,6 +179,21 @@ class PostServiceImplTest {
 
         verify(postRepository, times(1)).delete(postEntity);
         verify(imageRepository, times(1)).delete(imageEntity);
+    }
+
+    @Test
+    void shouldThrowExceptionIfNoUserFound() {
+        when(principal.getName()).thenReturn(Constants.USERNAME);
+        when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(()->
+                postService.createPost(new PostDTO(), principal)).isInstanceOf(UsernameNotFoundException.class);
+
+        Assertions.assertThatThrownBy(()->
+                postService.deletePost(1L, principal)).isInstanceOf(UsernameNotFoundException.class);
+
+        Assertions.assertThatThrownBy(()->
+                postService.getAllPostsForUser(principal)).isInstanceOf(UsernameNotFoundException.class);
     }
 
 }
