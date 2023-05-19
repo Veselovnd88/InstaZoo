@@ -69,6 +69,19 @@ public class UserServiceImpl implements UserService {
         return userMapper.entityToUser(userFromPrincipal);
     }
 
+    @Override
+    public User getUserById(Long userId) {
+        UserEntity userEntity = userRepository.findUserById(userId).orElseThrow(
+                () -> {
+                    log.error("User with such [userId {}] not found", userId);
+                    throw new UsernameNotFoundException(
+                            String.format("User with such [useId %s] not found", userId)
+                    );
+                });
+        return userMapper.entityToUser(userEntity);
+    }
+
+
     private UserEntity getUserByPrincipal(Principal principal) {
         String username = principal.getName();
         return userRepository.findUserByUsername(username).orElseThrow(
