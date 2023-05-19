@@ -35,8 +35,8 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentMapper commentMapper;
 
-    @Override
     @Transactional
+    @Override
     public Comment saveComment(Long postId, CommentDTO commentDTO, Principal principal) {
         UserEntity userEntity = getUserByPrincipal(principal);
         PostEntity post = getPostById(postId);
@@ -54,8 +54,8 @@ public class CommentServiceImpl implements CommentService {
         return commentMapper.entitiesToComments(comments);
     }
 
-    @Override
     @Transactional
+    @Override
     public void deleteComment(Long commentId) {
         Optional<CommentEntity> commentOptional = commentRepository.findById(commentId);
         commentOptional.ifPresent(commentRepository::delete);

@@ -1,5 +1,6 @@
 package ru.veselov.instazoo.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.Set;
@@ -8,8 +9,10 @@ import java.util.Set;
 public class PostDTO {
     private Long id;
 
+    @NotEmpty(message = "Should not be empty")
     private String title;
 
+    @NotEmpty(message = "Should not be empty")
     private String caption;
 
     private String location;

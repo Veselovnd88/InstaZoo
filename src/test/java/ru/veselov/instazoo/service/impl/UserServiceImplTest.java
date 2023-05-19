@@ -18,6 +18,7 @@ import ru.veselov.instazoo.dto.UserDTO;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.entity.enums.ERole;
 import ru.veselov.instazoo.exception.UserAlreadyExistsException;
+import ru.veselov.instazoo.exception.UserNotFoundException;
 import ru.veselov.instazoo.mapper.UserMapper;
 import ru.veselov.instazoo.mapper.UserMapperImpl;
 import ru.veselov.instazoo.model.User;
@@ -146,6 +147,26 @@ class UserServiceImplTest {
 
         Assertions.assertThatThrownBy(() -> userService.getCurrentUser(principal))
                 .isInstanceOf(UsernameNotFoundException.class);
+    }
+
+    @Test
+    void shouldFindUserById() {
+        UserEntity userEntity = TestUtils.getUserEntity();
+        when(userRepository.findUserById(Constants.ANY_ID)).thenReturn(Optional.of(userEntity));
+
+        User currentUser = userService.getUserById(Constants.ANY_ID);
+
+        verify(userRepository, times(1)).findUserById(Constants.ANY_ID);
+        Assertions.assertThat(currentUser.getFirstname()).isEqualTo(userEntity.getFirstname());
+        Assertions.assertThat(currentUser.getLastname()).isEqualTo(userEntity.getLastname());
+    }
+
+    @Test
+    void shouldThrowExceptionIfNoUserByIdFound() {
+        when(userRepository.findUserById(Constants.ANY_ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> userService.getUserById(Constants.ANY_ID))
+                .isInstanceOf(UserNotFoundException.class);
     }
 
 }

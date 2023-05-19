@@ -10,6 +10,7 @@ import ru.veselov.instazoo.dto.UserDTO;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.entity.enums.ERole;
 import ru.veselov.instazoo.exception.UserAlreadyExistsException;
+import ru.veselov.instazoo.exception.UserNotFoundException;
 import ru.veselov.instazoo.mapper.UserMapper;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.request.SignUpRequest;
@@ -71,13 +72,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long userId) {
-        UserEntity userEntity = userRepository.findUserById(userId).orElseThrow(
-                () -> {
-                    log.error("User with such [userId {}] not found", userId);
-                    throw new UsernameNotFoundException(
-                            String.format("User with such [useId %s] not found", userId)
-                    );
-                });
+        UserEntity userEntity = userRepository.findUserById(userId).orElseThrow(() -> {
+            log.error("User with such [userId {}] not found", userId);
+            throw new UserNotFoundException(
+                    String.format("User with such [useId %s] not found", userId)
+            );
+        });
         return userMapper.entityToUser(userEntity);
     }
 

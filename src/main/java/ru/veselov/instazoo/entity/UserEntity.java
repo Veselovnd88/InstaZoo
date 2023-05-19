@@ -38,7 +38,7 @@ public class UserEntity extends BaseEntity {
     private String bio;
     @Column(name = "password", length = 3000)// for encryption
     private String password;
-    @ElementCollection(targetClass = ERole.class)
+    @ElementCollection(targetClass = ERole.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"))
     private Set<ERole> roles = new HashSet<>();
