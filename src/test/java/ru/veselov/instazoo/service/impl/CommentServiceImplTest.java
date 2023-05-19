@@ -98,24 +98,21 @@ class CommentServiceImplTest {
 
     @Test
     void shouldThrowExceptionIfUsernameNotFound() {
+        CommentDTO commentDTO = TestUtils.getCommentDTO();
         when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.empty());
         when(principal.getName()).thenReturn(Constants.USERNAME);
-        Assertions.assertThatThrownBy(() ->
-                commentService.saveComment(
-                        Constants.ANY_ID,
-                        TestUtils.getCommentDTO(),
-                        principal
-                )).isInstanceOf(UsernameNotFoundException.class);
+        Assertions.assertThatThrownBy(() -> commentService.saveComment(Constants.ANY_ID, commentDTO, principal))
+                .isInstanceOf(UsernameNotFoundException.class);
     }
 
     @Test
     void shouldThrowExceptionIfPostNotFound() {
+        CommentDTO commentDTO = TestUtils.getCommentDTO();
         when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.empty());
         when(principal.getName()).thenReturn(Constants.USERNAME);
         when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.of(TestUtils.getUserEntity()));
 
-        Assertions.assertThatThrownBy(() ->
-                        commentService.saveComment(Constants.ANY_ID, TestUtils.getCommentDTO(), principal))
+        Assertions.assertThatThrownBy(() -> commentService.saveComment(Constants.ANY_ID, commentDTO, principal))
                 .isInstanceOf(PostNotFoundException.class);
 
         Assertions.assertThatThrownBy(() ->

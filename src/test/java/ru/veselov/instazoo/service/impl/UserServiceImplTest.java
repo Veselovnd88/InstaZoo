@@ -82,23 +82,20 @@ class UserServiceImplTest {
         when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
         when(userRepository.findUserByEmail(ArgumentMatchers.anyString())).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() ->
-                userService.createUser(signUpRequest)
-        ).isInstanceOf(UserAlreadyExistsException.class);
+        Assertions.assertThatThrownBy(() -> userService.createUser(signUpRequest))
+                .isInstanceOf(UserAlreadyExistsException.class);
 
         when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.empty());
         when(userRepository.findUserByEmail(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
 
-        Assertions.assertThatThrownBy(() ->
-                userService.createUser(signUpRequest)
-        ).isInstanceOf(UserAlreadyExistsException.class);
+        Assertions.assertThatThrownBy(() -> userService.createUser(signUpRequest))
+                .isInstanceOf(UserAlreadyExistsException.class);
 
         when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
         when(userRepository.findUserByEmail(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
 
-        Assertions.assertThatThrownBy(() ->
-                userService.createUser(signUpRequest)
-        ).isInstanceOf(UserAlreadyExistsException.class);
+        Assertions.assertThatThrownBy(() -> userService.createUser(signUpRequest))
+                .isInstanceOf(UserAlreadyExistsException.class);
 
         verify(userRepository, never()).save(ArgumentMatchers.any());
     }
@@ -138,9 +135,8 @@ class UserServiceImplTest {
         when(principal.getName()).thenReturn(Constants.USERNAME);
         when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() ->
-                userService.updateUser(userDTO, principal)
-        ).isInstanceOf(UsernameNotFoundException.class);
+        Assertions.assertThatThrownBy(() -> userService.updateUser(userDTO, principal))
+                .isInstanceOf(UsernameNotFoundException.class);
     }
 
     @Test
@@ -148,9 +144,8 @@ class UserServiceImplTest {
         when(principal.getName()).thenReturn(Constants.USERNAME);
         when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() ->
-                userService.getCurrentUser(principal)
-        ).isInstanceOf(UsernameNotFoundException.class);
+        Assertions.assertThatThrownBy(() -> userService.getCurrentUser(principal))
+                .isInstanceOf(UsernameNotFoundException.class);
     }
 
 }

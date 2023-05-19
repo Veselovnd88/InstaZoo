@@ -41,9 +41,8 @@ class CustomUserDetailsServiceTest {
     void shouldThrowExceptionIfNoSuchUsername() {
         when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() ->
-                customUserDetailsService.loadUserByUsername(Constants.USERNAME)
-        ).isInstanceOf(UsernameNotFoundException.class);
+        Assertions.assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(Constants.USERNAME))
+                .isInstanceOf(UsernameNotFoundException.class);
     }
 
     @Test
@@ -63,9 +62,8 @@ class CustomUserDetailsServiceTest {
     void shouldThrowEntityNotFoundException() {
         when(userRepository.findUserById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() ->
-                customUserDetailsService.loadUserById(1L)
-        ).isInstanceOf(EntityNotFoundException.class);
+        Assertions.assertThatThrownBy(() -> customUserDetailsService.loadUserById(1L))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test

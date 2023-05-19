@@ -4,6 +4,7 @@ import ru.veselov.instazoo.dto.CommentDTO;
 import ru.veselov.instazoo.dto.PostDTO;
 import ru.veselov.instazoo.dto.UserDTO;
 import ru.veselov.instazoo.entity.CommentEntity;
+import ru.veselov.instazoo.entity.ImageEntity;
 import ru.veselov.instazoo.entity.PostEntity;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.entity.enums.ERole;
@@ -23,6 +24,7 @@ public class TestUtils {
         userEntity.setFirstname(Constants.FIRST_NAME);
         userEntity.setLastname(Constants.LAST_NAME);
         userEntity.setRoles(Set.of(ERole.ROLE_USER, ERole.ROLE_ADMIN));
+        userEntity.setId(Constants.ANY_ID);
         return userEntity;
     }
 
@@ -95,5 +97,14 @@ public class TestUtils {
         commentEntity.setMessage(Constants.COMMENT_MESSAGE);
         commentEntity.setUsername(Constants.USERNAME);
         return commentEntity;
+    }
+
+    public static ImageEntity getImageEntity() {
+        ImageEntity imageEntity = new ImageEntity();
+        imageEntity.setImageBytes(new byte[]{1, 2, 3, 4});
+        imageEntity.setName(Constants.IMAGE_NAME);
+        imageEntity.setPostId(Constants.ANY_ID);
+        imageEntity.setUserId(Constants.ANY_ID);
+        return imageEntity;
     }
 }

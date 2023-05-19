@@ -101,9 +101,7 @@ class PostServiceImplTest {
         UserEntity userEntity = TestUtils.getUserEntity();
         when(principal.getName()).thenReturn(Constants.USERNAME);
         when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
-        when(postRepository.findPostByIdAndUser(
-                ArgumentMatchers.anyLong(),
-                ArgumentMatchers.any(UserEntity.class))
+        when(postRepository.findPostByIdAndUser(ArgumentMatchers.anyLong(), ArgumentMatchers.any(UserEntity.class))
         ).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() ->
@@ -157,8 +155,7 @@ class PostServiceImplTest {
     @Test
     void shouldThrowExceptionIfNoPostForLikeFound() {
         when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.empty());
-        Assertions.assertThatThrownBy(() ->
-                postService.likePost(Constants.ANY_ID, Constants.USERNAME)
+        Assertions.assertThatThrownBy(() -> postService.likePost(Constants.ANY_ID, Constants.USERNAME)
         ).isInstanceOf(PostNotFoundException.class);
     }
 
@@ -168,9 +165,7 @@ class PostServiceImplTest {
         PostEntity postEntity = TestUtils.getPostEntity();
         when(principal.getName()).thenReturn(Constants.USERNAME);
         when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.of(userEntity));
-        when(postRepository.findPostByIdAndUser(
-                ArgumentMatchers.anyLong(),
-                ArgumentMatchers.any(UserEntity.class))
+        when(postRepository.findPostByIdAndUser(ArgumentMatchers.anyLong(), ArgumentMatchers.any(UserEntity.class))
         ).thenReturn(Optional.of(postEntity));
         ImageEntity imageEntity = new ImageEntity();
         when(imageRepository.findByPostId(postEntity.getId())).thenReturn(Optional.of(imageEntity));
@@ -183,16 +178,17 @@ class PostServiceImplTest {
 
     @Test
     void shouldThrowExceptionIfNoUserFound() {
+        PostDTO postDTO = TestUtils.getPostDTO();
         when(principal.getName()).thenReturn(Constants.USERNAME);
         when(userRepository.findUserByUsername(ArgumentMatchers.anyString())).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(()->
-                postService.createPost(new PostDTO(), principal)).isInstanceOf(UsernameNotFoundException.class);
+        Assertions.assertThatThrownBy(() ->
+                postService.createPost(postDTO, principal)).isInstanceOf(UsernameNotFoundException.class);
 
-        Assertions.assertThatThrownBy(()->
+        Assertions.assertThatThrownBy(() ->
                 postService.deletePost(1L, principal)).isInstanceOf(UsernameNotFoundException.class);
 
-        Assertions.assertThatThrownBy(()->
+        Assertions.assertThatThrownBy(() ->
                 postService.getAllPostsForUser(principal)).isInstanceOf(UsernameNotFoundException.class);
     }
 
