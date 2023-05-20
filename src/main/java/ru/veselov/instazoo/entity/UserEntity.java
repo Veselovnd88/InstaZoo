@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import ru.veselov.instazoo.entity.enums.ERole;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.Set;
 @EqualsAndHashCode(exclude = {"roles", "posts"}, callSuper = false)
 @NoArgsConstructor
 @Table(name = "zoo_user")
+@ToString(exclude = {"posts",})
 public class UserEntity extends BaseEntity {
 
     @Column(name = "firstname", nullable = false)

@@ -39,7 +39,6 @@ public class CommentController {
                                  @PathVariable("postId") String postId,
                                  Principal principal) {
         fieldErrorResponseService.validateFields(bindingResult);
-
         return commentService.saveComment(Long.parseLong(postId), commentDTO, principal);
     }
 
@@ -51,8 +50,7 @@ public class CommentController {
     @DeleteMapping("/{commentId}/delete")
     public ResponseEntity<String> deleteComment(@PathVariable("commentId") String commentId) {
         commentService.deleteComment(Long.parseLong(commentId));
-        return ResponseEntity.ok("Comment deleted");
+        return ResponseEntity.ok(String.format("Comment %s deleted", commentId));
     }
-
 
 }

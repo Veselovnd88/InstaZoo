@@ -17,10 +17,10 @@ public interface PostMapper {
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "likedUsers", ignore = true)
     PostEntity toEntity(PostDTO postDTO);
 
-    @Mapping(target = "comments", ignore = true)
-    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "username", ignore = true)
     Post entityToPost(PostEntity postEntity);
 
     List<Post> entitiesToPosts(List<PostEntity> entities);

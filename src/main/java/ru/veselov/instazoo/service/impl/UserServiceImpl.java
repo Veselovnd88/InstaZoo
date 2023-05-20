@@ -54,6 +54,7 @@ public class UserServiceImpl implements UserService {
         log.info("User with [username {}] successfully created and saved", username);
     }
 
+    @Transactional
     @Override
     public User updateUser(UserDTO userDTO, Principal principal) {
         UserEntity userFromPrincipal = getUserByPrincipal(principal);

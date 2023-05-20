@@ -2,20 +2,20 @@ package ru.veselov.instazoo.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import ru.veselov.instazoo.entity.PostEntity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-public class Comment {
+public class Comment implements Serializable {
 
     private Long id;
-
-    private PostEntity post;
 
     private String username;
 
     private Long userId;
+
+    private Long postId;
 
     private String message;
 

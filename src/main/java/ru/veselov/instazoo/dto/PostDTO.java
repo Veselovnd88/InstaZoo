@@ -3,8 +3,6 @@ package ru.veselov.instazoo.dto;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-import java.util.Set;
-
 @Data
 public class PostDTO {
     private Long id;
@@ -18,7 +16,5 @@ public class PostDTO {
     private String location;
 
     private Integer likes;
-
-    private Set<String> likedUsers;
 
 }

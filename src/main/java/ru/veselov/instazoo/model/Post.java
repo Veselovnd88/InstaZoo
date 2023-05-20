@@ -1,13 +1,12 @@
 package ru.veselov.instazoo.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -23,11 +22,10 @@ public class Post implements Serializable {
 
     private Integer likes;
 
+    @JsonIgnore
+    private String username;
+
     private Set<String> likedUsers = new HashSet<>();
-
-    private User user;
-
-    private List<Comment> comments = new ArrayList<>();
 
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime createdAt;

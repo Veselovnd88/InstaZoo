@@ -3,6 +3,7 @@ package ru.veselov.instazoo.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "post")
+@ToString(exclude = {"user","comments"})
 public class PostEntity extends BaseEntity {
     @Column(name = "title")
     private String title;
@@ -26,7 +28,7 @@ public class PostEntity extends BaseEntity {
     @ElementCollection(targetClass = String.class)
     @CollectionTable(
             name = "post_liked_users",
-            joinColumns=@JoinColumn(name = "post_id", referencedColumnName = "id")
+            joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id")
     )
     private Set<String> likedUsers = new HashSet<>();
 

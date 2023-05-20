@@ -35,8 +35,10 @@ public class PostServiceImpl implements PostService {
 
     private final PostMapper postMapper;
 
-    @Override
+    //FIXME add username to everypost
+
     @Transactional
+    @Override
     public Post createPost(PostDTO postDTO, Principal principal) {
         UserEntity foundUserEntity = getUserByPrincipal(principal);
         PostEntity post = postMapper.toEntity(postDTO);
@@ -68,8 +70,8 @@ public class PostServiceImpl implements PostService {
         return postMapper.entitiesToPosts(posts);
     }
 
-    @Override
     @Transactional
+    @Override
     public Post likePost(Long postId, String username) {
         Optional<PostEntity> foundPost = postRepository.findById(postId);
         PostEntity post = foundPost.orElseThrow(() -> {
@@ -92,8 +94,8 @@ public class PostServiceImpl implements PostService {
         return postMapper.entityToPost(saved);
     }
 
-    @Override
     @Transactional
+    @Override
     public void deletePost(Long postId, Principal principal) {
         PostEntity postEntity = getPostByIdAndPrincipal(postId, principal);
         Optional<ImageEntity> imageOptional = imageRepository.findByPostId(postEntity.getId());

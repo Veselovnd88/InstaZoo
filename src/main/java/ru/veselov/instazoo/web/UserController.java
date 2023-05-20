@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.veselov.instazoo.dto.UserDTO;
+import ru.veselov.instazoo.mapper.UserMapper;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.service.UserService;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
@@ -28,7 +29,8 @@ public class UserController {
     private final UserService userService;
     private final FieldErrorResponseService fieldErrorResponseService;
 
-    //FIXME convert model to UserDTO everywhere
+    private final UserMapper userMapper;
+
     //FIXME change error when usernotFound
     @GetMapping
     public User getCurrentUser(Principal principal) {
@@ -36,15 +38,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User getUserProfile(@PathVariable("userId") String userId) {
-        return userService.getUserById(Long.parseLong(userId));
+    public UserDTO getUserProfile(@PathVariable("userId") String userId) {
+        User user = userService.getUserById(Long.parseLong(userId));
+        return userMapper.modelToDTO(user);
     }
 
     @PutMapping("/update")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public User updateUser(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult, Principal principal) {
+    public UserDTO updateUser(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult, Principal principal) {
         fieldErrorResponseService.validateFields(bindingResult);
-        return userService.updateUser(userDTO, principal);
+        User user = userService.updateUser(userDTO, principal);
+        return userMapper.modelToDTO(user);
     }
 
 }

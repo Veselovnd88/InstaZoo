@@ -19,6 +19,7 @@ public interface CommentMapper {
     @Mapping(target = "post", ignore = true)
     CommentEntity dtoToEntity(CommentDTO commentDTO);
 
+    @Mapping(target = "postId", expression = "java(commentEntity.getPost().getId())")
     Comment entityToComment(CommentEntity commentEntity);
 
     List<Comment> entitiesToComments(List<CommentEntity> entityList);
