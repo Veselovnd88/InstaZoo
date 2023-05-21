@@ -23,13 +23,13 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException {
         ErrorResponse<String> errorResponse = new ErrorResponse<>(
                 ErrorConstants.ERROR_NOT_AUTHORIZED,
-                "Invalid login or password",
+                "Invalid login or password, or token",
                 HttpStatus.UNAUTHORIZED);
         String jsonLoginResponse = new Gson().toJson(errorResponse);
         response.setContentType(SecurityConstants.CONTENT_TYPE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().println(jsonLoginResponse);
-        log.error("Invalid credentials data [{}]", authException.getMessage());
+        log.error("Invalid credentials data");
     }
 
 }

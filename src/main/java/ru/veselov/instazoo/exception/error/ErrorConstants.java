@@ -14,4 +14,6 @@ public class ErrorConstants {
 
     public static final String ERROR_NOT_FOUND = "error.not.found";
 
+    public static final String SERVER_ERROR = "error.server";
+
 }

@@ -14,16 +14,21 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "post")
-@ToString(exclude = {"user","comments"})
+@ToString(exclude = {"user", "comments"})
 public class PostEntity extends BaseEntity {
+
     @Column(name = "title")
     private String title;
+
     @Column(name = "caption")
     private String caption;
+
     @Column(name = "location")
     private String location;
+
     @Column(name = "likes")
     private Integer likes;
+
     @Column(name = "liked_users")
     @ElementCollection(targetClass = String.class)
     @CollectionTable(
@@ -34,6 +39,7 @@ public class PostEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
+
     @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, mappedBy = "post", orphanRemoval = true)
     private List<CommentEntity> comments = new ArrayList<>();
 

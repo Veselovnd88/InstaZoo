@@ -40,8 +40,13 @@ public class ApiExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     @ResponseBody
     public ErrorResponse<String> handleAuthenticationException(RuntimeException exception) {
-        return new ErrorResponse<>(ErrorConstants.ERROR_NOT_FOUND, exception.getMessage(),
-                HttpStatus.NOT_FOUND);
+        return new ErrorResponse<>(ErrorConstants.ERROR_NOT_FOUND, exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ImageProcessingException.class)
+    @ResponseBody
+    public ErrorResponse<String> handleImageProcessingException(RuntimeException exception) {
+        return new ErrorResponse<>(ErrorConstants.SERVER_ERROR, exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 }

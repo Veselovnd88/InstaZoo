@@ -27,14 +27,15 @@ import java.security.Principal;
 public class UserController {
 
     private final UserService userService;
+
     private final FieldErrorResponseService fieldErrorResponseService;
 
     private final UserMapper userMapper;
 
-    //FIXME change error when usernotFound
-    @GetMapping
-    public User getCurrentUser(Principal principal) {
-        return userService.getCurrentUser(principal);
+    @GetMapping()
+    public UserDTO getCurrentUser(Principal principal) {
+        User currentUser = userService.getCurrentUser(principal);
+        return userMapper.modelToDTO(currentUser);
     }
 
     @GetMapping("/{userId}")
