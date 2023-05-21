@@ -5,17 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.BodyInserters;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.security.JwtProvider;
 import ru.veselov.instazoo.service.ImageService;
@@ -24,15 +24,13 @@ import ru.veselov.instazoo.util.TestUtils;
 
 import java.security.Principal;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 class ImageControllerTest {
 
     @Autowired
-    WebTestClient webTestClient;
+    MockMvc mockMvc;
 
     @Autowired
     JwtProvider jwtProvider;
@@ -53,16 +51,13 @@ class ImageControllerTest {
     }
 
     @Test
-    void shouldCallImageServiceToUploadImageToUser() {
-        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part("file", new byte[]{1, 2, 3}, MediaType.MULTIPART_FORM_DATA);
+    void shouldCallImageServiceToUploadImageToUser() throws Exception {
+        MockMultipartFile multipartFile = new MockMultipartFile("file", new byte[]{1, 2, 3});
+        MockMultipartHttpServletRequestBuilder file = MockMvcRequestBuilders
+                .multipart("/api/image/upload").file(multipartFile);
 
-        webTestClient.post().uri(
-                        uriBuilder -> uriBuilder.path("/api/image/upload").build())
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
-                .bodyValue(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
-                .exchange().expectStatus().isAccepted();
+        mockMvc.perform(file.header(Constants.AUTH_HEADER, header))
+                .andExpect(MockMvcResultMatchers.status().isAccepted());
 
         Mockito.verify(imageService, Mockito.times(1)).uploadImageToUser(
                 ArgumentMatchers.any(MultipartFile.class),
@@ -71,6 +66,40 @@ class ImageControllerTest {
     }
 
     @Test
-    void uploadImageToPost() {
+    void shouldCallImageServiceToUploadImageToPost() throws Exception {
+        String postId = Constants.ANY_ID.toString();
+        MockMultipartFile multipartFile = new MockMultipartFile("file", new byte[]{1, 2, 3});
+        MockMultipartHttpServletRequestBuilder file = MockMvcRequestBuilders
+                .multipart("/api/image/" + postId + "/upload").file(multipartFile);
+
+        mockMvc.perform(file.header(Constants.AUTH_HEADER, header))
+                .andExpect(MockMvcResultMatchers.status().isAccepted());
+
+        Mockito.verify(imageService, Mockito.times(1)).uploadImageToPost(
+                ArgumentMatchers.any(MultipartFile.class),
+                ArgumentMatchers.any(Principal.class),
+                ArgumentMatchers.any(Long.class)
+        );
     }
+
+    @Test
+    void shouldCallImageServiceToGetAllProfileImage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/image/profile")
+                        .header(Constants.AUTH_HEADER, header))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Mockito.verify(imageService, Mockito.times(1)).getImageToUser(ArgumentMatchers.any(Principal.class));
+    }
+
+    @Test
+    void shouldCallImageServiceToGetPostImage() throws Exception {
+        String postId = Constants.ANY_ID.toString();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/image/post/" + postId)
+                        .header(Constants.AUTH_HEADER, header))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Mockito.verify(imageService, Mockito.times(1)).getImageToPost(Constants.ANY_ID);
+    }
+
 }
