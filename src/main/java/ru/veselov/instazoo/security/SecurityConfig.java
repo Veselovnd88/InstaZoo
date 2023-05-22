@@ -29,15 +29,15 @@ public class SecurityConfig {
         http.cors().disable()
                 .httpBasic().disable()
                 .csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(r ->
                         r.requestMatchers(SecurityConstants.SIGN_UP_URLS).permitAll()
                                 .anyRequest().authenticated()
-                );
+                ).exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+
+
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

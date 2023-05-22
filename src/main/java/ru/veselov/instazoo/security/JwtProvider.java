@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import ru.veselov.instazoo.exception.CustomJwtException;
 import ru.veselov.instazoo.model.User;
 
 import java.security.Key;
@@ -47,7 +48,7 @@ JwtProvider {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token) throws CustomJwtException {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(getKey(securityProperties.getSecret())).build().parseClaimsJws(token).getBody();
@@ -58,6 +59,9 @@ JwtProvider {
                  ExpiredJwtException |
                  UnsupportedJwtException |
                  IllegalArgumentException exception) {
+            if (exception instanceof ExpiredJwtException) {
+                throw new CustomJwtException("Jwt is expired");
+            }
             log.error("Error occurred during parsing Jwt [{}]", exception.getMessage());
             return false;
         }

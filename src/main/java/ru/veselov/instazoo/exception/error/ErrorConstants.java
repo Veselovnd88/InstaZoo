@@ -16,4 +16,6 @@ public class ErrorConstants {
 
     public static final String SERVER_ERROR = "error.server";
 
+    public static final String JWT_EXPIRED = "error.jwt.expired";
+
 }
