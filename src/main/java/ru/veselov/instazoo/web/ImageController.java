@@ -29,7 +29,6 @@ public class ImageController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<String> uploadImageToUser(@RequestParam("file") MultipartFile multipartFile, Principal principal) {
         imageService.uploadImageToUser(multipartFile, principal);
-        //FIXME exception : MultipartException
         return ResponseEntity.accepted().body("Image upload successfully");
     }
 

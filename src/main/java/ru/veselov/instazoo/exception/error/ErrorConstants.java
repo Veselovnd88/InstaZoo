@@ -18,4 +18,6 @@ public class ErrorConstants {
 
     public static final String JWT_EXPIRED = "error.jwt.expired";
 
+    public static final String BAD_REQUEST = "error.bad.request";
+
 }
