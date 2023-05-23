@@ -67,7 +67,6 @@ public class ApiExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BasicErrorResponse handleServletException(ServletException exception) {
-        log.warn("i am here ");
         return new BasicErrorResponse(ErrorConstants.BAD_REQUEST, exception.getMessage());
     }
 
