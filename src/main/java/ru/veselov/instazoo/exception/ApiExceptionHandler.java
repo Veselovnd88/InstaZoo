@@ -2,6 +2,7 @@ package ru.veselov.instazoo.exception;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.ServletException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import ru.veselov.instazoo.exception.error.BasicErrorResponse;
 import ru.veselov.instazoo.exception.error.ErrorConstants;
 import ru.veselov.instazoo.exception.error.JwtErrorResponse;
@@ -58,6 +60,14 @@ public class ApiExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BasicErrorResponse handleMultipartException(RuntimeException exception) {
+        return new BasicErrorResponse(ErrorConstants.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BasicErrorResponse handleServletException(ServletException exception) {
+        log.warn("i am here ");
         return new BasicErrorResponse(ErrorConstants.BAD_REQUEST, exception.getMessage());
     }
 

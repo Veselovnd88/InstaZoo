@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(r ->
-                        r.requestMatchers(SecurityConstants.SIGN_UP_URLS).permitAll()
+                        r.requestMatchers(SecurityConstants.SIGN_UP_URLS, SecurityConstants.ERROR_URL).permitAll()
                                 .anyRequest().authenticated()
                 ).exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 

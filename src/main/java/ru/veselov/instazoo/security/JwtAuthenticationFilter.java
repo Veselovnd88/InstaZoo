@@ -47,7 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,

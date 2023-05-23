@@ -21,8 +21,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-
-        log.warn("{}", authException.getMessage());
         BasicErrorResponse basicErrorResponse = new BasicErrorResponse(
                 ErrorConstants.ERROR_NOT_AUTHORIZED,
                 "Invalid login, password or token");
