@@ -2,17 +2,15 @@ package ru.veselov.instazoo.exception.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-public class ErrorResponse<T> implements Serializable {
+@NoArgsConstructor
+public abstract class ErrorResponse implements Serializable {
+
     private String error;
-
-    private T message;
-
-    private HttpStatus httpStatus;
 
 }

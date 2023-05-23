@@ -1,7 +1,6 @@
 package ru.veselov.instazoo.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import ru.veselov.instazoo.exception.CustomJwtException;
 import ru.veselov.instazoo.model.User;
 
 import java.security.Key;
@@ -48,7 +46,7 @@ JwtProvider {
                 .compact();
     }
 
-    public boolean validateToken(String token) throws CustomJwtException {
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(getKey(securityProperties.getSecret())).build().parseClaimsJws(token).getBody();
@@ -56,12 +54,8 @@ JwtProvider {
             return true;
         } catch (SignatureException |
                  MalformedJwtException |
-                 ExpiredJwtException |
                  UnsupportedJwtException |
                  IllegalArgumentException exception) {
-            if (exception instanceof ExpiredJwtException) {
-                throw new CustomJwtException("Jwt is expired");
-            }
             log.error("Error occurred during parsing Jwt [{}]", exception.getMessage());
             return false;
         }

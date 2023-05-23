@@ -1,16 +1,17 @@
 package ru.veselov.instazoo.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.veselov.instazoo.exception.error.BasicErrorResponse;
 import ru.veselov.instazoo.exception.error.ErrorConstants;
-import ru.veselov.instazoo.exception.error.ErrorResponse;
-
-import javax.naming.AuthenticationException;
-import java.util.Map;
+import ru.veselov.instazoo.exception.error.JwtErrorResponse;
+import ru.veselov.instazoo.exception.error.ValidationErrorResponse;
 
 @RestControllerAdvice
 @Slf4j
@@ -18,35 +19,38 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     @ResponseBody
-    public ErrorResponse<String> handleEntityAlreadyExistsException(RuntimeException exception) {
-        return new ErrorResponse<>(ErrorConstants.ERROR_CONFLICT, exception.getMessage(), HttpStatus.CONFLICT);
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public BasicErrorResponse handleEntityAlreadyExistsException(RuntimeException exception) {
+        return new BasicErrorResponse(ErrorConstants.ERROR_CONFLICT, exception.getMessage());
     }
 
     @ExceptionHandler(CustomValidationException.class)
     @ResponseBody
-    public ErrorResponse<Map<String, String>> handleValidationException(CustomValidationException exception) {
-        return new ErrorResponse<>(
-                ErrorConstants.ERROR_VALIDATION,
-                exception.getValidationMap(),
-                HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationErrorResponse handleValidationException(CustomValidationException exception) {
+        return new ValidationErrorResponse(ErrorConstants.ERROR_VALIDATION,
+                exception.getValidationMap());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseBody
-    public ErrorResponse<String> handleEntityNotFoundException(RuntimeException exception) {
-        return new ErrorResponse<>(ErrorConstants.ERROR_NOT_FOUND, exception.getMessage(), HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BasicErrorResponse handleEntityNotFoundException(RuntimeException exception) {
+        return new BasicErrorResponse(ErrorConstants.ERROR_NOT_FOUND, exception.getMessage());
     }
 
-    @ExceptionHandler(AuthenticationException.class)
+    @ExceptionHandler(ExpiredJwtException.class)
     @ResponseBody
-    public ErrorResponse<String> handleAuthenticationException(RuntimeException exception) {
-        return new ErrorResponse<>(ErrorConstants.ERROR_NOT_FOUND, exception.getMessage(), HttpStatus.NOT_FOUND);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public JwtErrorResponse handleJwtExpiredException(RuntimeException exception) {
+        return new JwtErrorResponse(ErrorConstants.JWT_EXPIRED, exception.getMessage(), "/api/auth/signin");
     }
 
     @ExceptionHandler(ImageProcessingException.class)
     @ResponseBody
-    public ErrorResponse<String> handleImageProcessingException(RuntimeException exception) {
-        return new ErrorResponse<>(ErrorConstants.SERVER_ERROR, exception.getMessage(), HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BasicErrorResponse handleImageProcessingException(RuntimeException exception) {
+        return new BasicErrorResponse(ErrorConstants.SERVER_ERROR, exception.getMessage());
     }
 
 }

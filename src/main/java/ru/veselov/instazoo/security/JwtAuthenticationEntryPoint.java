@@ -9,7 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import ru.veselov.instazoo.exception.error.ErrorConstants;
-import ru.veselov.instazoo.exception.error.ErrorResponse;
+import ru.veselov.instazoo.exception.error.BasicErrorResponse;
 
 import java.io.IOException;
 
@@ -23,11 +23,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException {
 
         log.warn("{}", authException.getMessage());
-        ErrorResponse<String> errorResponse = new ErrorResponse<>(
+        BasicErrorResponse basicErrorResponse = new BasicErrorResponse(
                 ErrorConstants.ERROR_NOT_AUTHORIZED,
-                "Invalid login or password, or token",
-                HttpStatus.UNAUTHORIZED);
-        String jsonLoginResponse = new Gson().toJson(errorResponse);
+                "Invalid login, password or token");
+        String jsonLoginResponse = new Gson().toJson(basicErrorResponse);
         response.setContentType(SecurityConstants.CONTENT_TYPE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().println(jsonLoginResponse);
