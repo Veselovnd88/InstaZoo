@@ -7,7 +7,8 @@ security:
   secret: "D9D323C5E55F45C206D7880329B1721A4334C00F336E5F2F1E9DAB745FF44837"
   prefix: "Bearer "
   header: "Authorization"
-  expiration-time: 3000000
+  expiration-time: 600000
+  refresh-expiration-time: 18000000
 
 spring:
   datasource:

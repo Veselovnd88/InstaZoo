@@ -19,4 +19,6 @@ public class SecurityProperties {
 
     private Long expirationTime;
 
+    private Long refreshExpirationTime;
+
 }

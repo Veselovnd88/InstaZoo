@@ -46,7 +46,11 @@ public class ApiExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public JwtErrorResponse handleJwtExpiredException(RuntimeException exception) {
-        return new JwtErrorResponse(ErrorConstants.JWT_EXPIRED, exception.getMessage(), "/api/auth/signin");
+        return new JwtErrorResponse(
+                ErrorConstants.JWT_EXPIRED,
+                exception.getMessage(),
+                "/api/auth/signin",
+                "/api/auth/refresh-token");
     }
 
     @ExceptionHandler(ImageProcessingException.class)
@@ -67,6 +71,13 @@ public class ApiExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BasicErrorResponse handleServletException(ServletException exception) {
+        return new BasicErrorResponse(ErrorConstants.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(BadTokenException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BasicErrorResponse handleJwtException(RuntimeException exception) {
         return new BasicErrorResponse(ErrorConstants.BAD_REQUEST, exception.getMessage());
     }
 

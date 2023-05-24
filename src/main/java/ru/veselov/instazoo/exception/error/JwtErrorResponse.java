@@ -13,10 +13,13 @@ public class JwtErrorResponse extends ErrorResponse {
 
     private String signInUrl;
 
-    public JwtErrorResponse(String error, String message, String signInUrl) {
+    private String refreshToken;
+
+    public JwtErrorResponse(String error, String message, String signInUrl, String refreshToken) {
         super(error);
         this.message = message;
         this.signInUrl = signInUrl;
+        this.refreshToken = refreshToken;
     }
 
 }
