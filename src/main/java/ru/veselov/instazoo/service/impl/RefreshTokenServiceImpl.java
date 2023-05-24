@@ -31,6 +31,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public AuthResponse processRefreshToken(String refreshToken) {
         try {
             if (jwtProvider.validateToken(refreshToken, TokenType.REFRESH)) {
+                log.info("Refresh token validated");
                 Long userId = jwtProvider.getUserIdFromToken(refreshToken);
                 User user = userDetailsService.loadUserById(userId);
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -42,9 +43,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 }
                 return new AuthResponse(true, jwt, refreshToken);
             } else {
+                log.error("Invalid refresh token");
                 throw new BadTokenException("Refresh token is invalid, please re-login");
             }
         } catch (ExpiredJwtException e) {
+            log.error("Expired refresh token");
             throw new BadTokenException("Refresh token is invalid, please re-login");
         }
     }
