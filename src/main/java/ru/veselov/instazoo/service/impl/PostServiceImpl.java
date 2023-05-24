@@ -35,8 +35,6 @@ public class PostServiceImpl implements PostService {
 
     private final PostMapper postMapper;
 
-    //FIXME add username to everypost
-
     @Transactional
     @Override
     public Post createPost(PostDTO postDTO, Principal principal) {
@@ -44,6 +42,7 @@ public class PostServiceImpl implements PostService {
         PostEntity post = postMapper.toEntity(postDTO);
         post.setUser(foundUserEntity);
         post.setLikes(0);
+        post.setUsername(foundUserEntity.getUsername());
         PostEntity saved = postRepository.save(post);
         log.info("[Post #{}] saved to repository", post.getId());
         return postMapper.entityToPost(saved);

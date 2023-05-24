@@ -23,6 +23,9 @@ public class PostEntity extends BaseEntity {
     @Column(name = "caption")
     private String caption;
 
+    @Column(name = "username")
+    private String username;
+
     @Column(name = "location")
     private String location;
 

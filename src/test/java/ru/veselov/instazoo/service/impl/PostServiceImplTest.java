@@ -68,11 +68,13 @@ class PostServiceImplTest {
         Assertions.assertThat(captured.getTitle()).isEqualTo(postDTO.getTitle());
         Assertions.assertThat(captured.getCaption()).isEqualTo(postDTO.getCaption());
         Assertions.assertThat(captured.getLocation()).isEqualTo(postDTO.getLocation());
+        Assertions.assertThat(captured.getUsername()).isEqualTo(userEntity.getUsername());
     }
 
     @Test
     void shouldReturnListOfPosts() {
         postService.getAllPosts();
+
         Mockito.verify(postRepository, times(1)).findAllByOrderByCreatedAtDesc();
     }
 

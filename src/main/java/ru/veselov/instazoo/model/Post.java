@@ -1,7 +1,6 @@
 package ru.veselov.instazoo.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,7 +21,6 @@ public class Post implements Serializable {
 
     private Integer likes;
 
-    @JsonIgnore
     private String username;
 
     private Set<String> likedUsers = new HashSet<>();

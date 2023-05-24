@@ -20,7 +20,6 @@ public interface PostMapper {
     @Mapping(target = "likedUsers", ignore = true)
     PostEntity toEntity(PostDTO postDTO);
 
-    @Mapping(target = "username", ignore = true)
     Post entityToPost(PostEntity postEntity);
 
     List<Post> entitiesToPosts(List<PostEntity> entities);
