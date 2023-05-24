@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
-public class JwtErrorResponse extends ErrorResponse {
+public class JwtErrorResponse extends CustomErrorResponse {
 
     private String message;
 

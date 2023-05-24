@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class BasicErrorResponse extends ErrorResponse {
+public class BasicErrorResponse extends CustomErrorResponse {
 
     private String message;
 

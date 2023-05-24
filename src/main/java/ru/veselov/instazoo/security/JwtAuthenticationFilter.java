@@ -31,6 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final CustomUserDetailsService userDetailsService;
 
+    private final JwtValidator jwtValidator;
+
     private final SecurityProperties securityProperties;
 
     @Qualifier("handlerExceptionResolver")
@@ -38,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     public JwtAuthenticationFilter(JwtProvider jwtProvider,
+                                   JwtValidator jwtValidator,
                                    CustomUserDetailsService userDetailsService,
                                    SecurityProperties securityProperties,
                                    HandlerExceptionResolver handlerExceptionResolver) {
@@ -45,6 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
         this.securityProperties = securityProperties;
         this.handlerExceptionResolver = handlerExceptionResolver;
+        this.jwtValidator = jwtValidator;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         String jwt = jwtOpt.get();
         try {
-            if (StringUtils.isNotBlank(jwt) && jwtProvider.validateToken(jwt, TokenType.ACCESS)) {
+            if (StringUtils.isNotBlank(jwt) && jwtValidator.validateAccessToken(jwt)) {
                 Long userId = jwtProvider.getUserIdFromToken(jwt);
                 User user = userDetailsService.loadUserById(userId);
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

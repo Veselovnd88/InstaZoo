@@ -1,6 +1,5 @@
 package ru.veselov.instazoo.service.impl;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +15,8 @@ import ru.veselov.instazoo.exception.BadTokenException;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.response.AuthResponse;
 import ru.veselov.instazoo.security.JwtProvider;
+import ru.veselov.instazoo.security.JwtValidator;
 import ru.veselov.instazoo.security.SecurityProperties;
-import ru.veselov.instazoo.security.TokenType;
 import ru.veselov.instazoo.service.CustomUserDetailsService;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
@@ -27,6 +26,9 @@ class RefreshTokenServiceImplTest {
 
     @Mock
     JwtProvider jwtProvider;
+
+    @Mock
+    JwtValidator jwtValidator;
 
     @Mock
     CustomUserDetailsService userDetailsService;
@@ -57,7 +59,7 @@ class RefreshTokenServiceImplTest {
 
     @Test
     void shouldGenerateAccessAndRefreshTokens() {
-        Mockito.when(jwtProvider.validateToken(token, TokenType.REFRESH)).thenReturn(true);
+        Mockito.when(jwtValidator.validateRefreshToken(token)).thenReturn(true);
         Mockito.when(jwtProvider.generateToken(ArgumentMatchers.any())).thenReturn("generated");
         Mockito.when(jwtProvider.getUserIdFromToken(token)).thenReturn(user.getId());
         Mockito.when(jwtProvider.generateRefreshToken(ArgumentMatchers.any())).thenReturn("refresh");
@@ -68,7 +70,7 @@ class RefreshTokenServiceImplTest {
 
         Assertions.assertThat(authResponse.getToken()).isEqualTo("Bearer generated");
         Assertions.assertThat(authResponse.getRefreshToken()).isEqualTo("refresh");
-        Mockito.verify(jwtProvider, Mockito.times(1)).validateToken(token, TokenType.REFRESH);
+        Mockito.verify(jwtValidator, Mockito.times(1)).validateRefreshToken(token);
         Mockito.verify(jwtProvider, Mockito.times(1)).isRefreshTokenExpiredSoon(token);
         Mockito.verify(jwtProvider, Mockito.times(1)).generateToken(ArgumentMatchers.any(Authentication.class));
         Mockito.verify(jwtProvider, Mockito.times(1)).generateRefreshToken(ArgumentMatchers.any(Authentication.class));
@@ -76,7 +78,7 @@ class RefreshTokenServiceImplTest {
 
     @Test
     void shouldGenerateOnlyAccessToken() {
-        Mockito.when(jwtProvider.validateToken(token, TokenType.REFRESH)).thenReturn(true);
+        Mockito.when(jwtValidator.validateRefreshToken(token)).thenReturn(true);
         Mockito.when(jwtProvider.generateToken(ArgumentMatchers.any())).thenReturn("generated");
         Mockito.when(jwtProvider.getUserIdFromToken(token)).thenReturn(user.getId());
         Mockito.when(jwtProvider.isRefreshTokenExpiredSoon(token)).thenReturn(false);
@@ -86,7 +88,7 @@ class RefreshTokenServiceImplTest {
 
         Assertions.assertThat(authResponse.getToken()).isEqualTo("Bearer generated");
         Assertions.assertThat(authResponse.getRefreshToken()).isEqualTo(token);
-        Mockito.verify(jwtProvider, Mockito.times(1)).validateToken(token, TokenType.REFRESH);
+        Mockito.verify(jwtValidator, Mockito.times(1)).validateRefreshToken(token);
         Mockito.verify(jwtProvider, Mockito.times(1)).isRefreshTokenExpiredSoon(token);
         Mockito.verify(jwtProvider, Mockito.times(1)).generateToken(ArgumentMatchers.any(Authentication.class));
         Mockito.verify(jwtProvider, Mockito.never()).generateRefreshToken(ArgumentMatchers.any(Authentication.class));
@@ -94,25 +96,12 @@ class RefreshTokenServiceImplTest {
 
     @Test
     void shouldThrowBadTokenExceptionIfTokenNotValidated() {
-        Mockito.when(jwtProvider.validateToken(token, TokenType.REFRESH)).thenReturn(false);
+        Mockito.when(jwtValidator.validateRefreshToken(token)).thenReturn(false);
 
         Assertions.assertThatThrownBy(() -> refreshTokenService.processRefreshToken(token))
                 .isInstanceOf(BadTokenException.class);
 
-        Mockito.verify(jwtProvider, Mockito.times(1)).validateToken(token, TokenType.REFRESH);
-        Mockito.verify(jwtProvider, Mockito.never()).isRefreshTokenExpiredSoon(token);
-        Mockito.verify(jwtProvider, Mockito.never()).generateToken(ArgumentMatchers.any(Authentication.class));
-        Mockito.verify(jwtProvider, Mockito.never()).generateRefreshToken(ArgumentMatchers.any(Authentication.class));
-    }
-
-    @Test
-    void shouldThrowBadTokenExceptionIfTokenIfExpiredExceptionThrown() {
-        Mockito.when(jwtProvider.validateToken(token, TokenType.REFRESH)).thenThrow(ExpiredJwtException.class);
-
-        Assertions.assertThatThrownBy(() -> refreshTokenService.processRefreshToken(token))
-                .isInstanceOf(BadTokenException.class);
-
-        Mockito.verify(jwtProvider, Mockito.times(1)).validateToken(token, TokenType.REFRESH);
+        Mockito.verify(jwtValidator, Mockito.times(1)).validateRefreshToken(token);
         Mockito.verify(jwtProvider, Mockito.never()).isRefreshTokenExpiredSoon(token);
         Mockito.verify(jwtProvider, Mockito.never()).generateToken(ArgumentMatchers.any(Authentication.class));
         Mockito.verify(jwtProvider, Mockito.never()).generateRefreshToken(ArgumentMatchers.any(Authentication.class));

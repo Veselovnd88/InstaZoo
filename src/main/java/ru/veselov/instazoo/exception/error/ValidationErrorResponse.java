@@ -7,7 +7,7 @@ import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ValidationErrorResponse extends ErrorResponse {
+public class ValidationErrorResponse extends CustomErrorResponse {
 
     private Map<String, String> validationMessages;
 

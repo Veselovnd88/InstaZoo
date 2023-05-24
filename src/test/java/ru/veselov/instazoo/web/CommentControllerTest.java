@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.instazoo.dto.CommentDTO;
 import ru.veselov.instazoo.model.User;
+import ru.veselov.instazoo.repository.UserRepository;
 import ru.veselov.instazoo.security.JwtProvider;
 import ru.veselov.instazoo.service.CommentService;
 import ru.veselov.instazoo.util.Constants;
@@ -20,6 +21,7 @@ import ru.veselov.instazoo.util.TestUtils;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -38,6 +40,9 @@ class CommentControllerTest {
     @MockBean
     FieldErrorResponseService fieldErrorResponseService;
 
+    @MockBean
+    UserRepository userRepository;
+
     User user;
 
     String header;
@@ -48,6 +53,7 @@ class CommentControllerTest {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, "Pass");
         String jwt = jwtProvider.generateToken(token);
         header = "Bearer " + jwt;
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(Optional.of(TestUtils.getUserEntity()));
     }
 
     @Test

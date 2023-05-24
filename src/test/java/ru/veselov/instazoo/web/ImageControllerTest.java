@@ -17,12 +17,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.instazoo.model.User;
+import ru.veselov.instazoo.repository.UserRepository;
 import ru.veselov.instazoo.security.JwtProvider;
 import ru.veselov.instazoo.service.ImageService;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -38,6 +40,9 @@ class ImageControllerTest {
     @MockBean
     ImageService imageService;
 
+    @MockBean
+    UserRepository userRepository;
+
     User user;
 
     String header;
@@ -48,6 +53,7 @@ class ImageControllerTest {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, "Pass");
         String jwt = jwtProvider.generateToken(token);
         header = "Bearer " + jwt;
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(Optional.of(TestUtils.getUserEntity()));
     }
 
     @Test
