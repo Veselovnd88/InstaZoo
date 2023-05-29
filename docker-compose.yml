@@ -1,5 +1,15 @@
 version: "3.8"
 services:
+  backend:
+    image: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6666:6666"
+    depends_on:
+      - database_zoo
+
   database_zoo:
     image: "postgres:15.2"
     restart: always
