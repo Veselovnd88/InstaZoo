@@ -10,7 +10,9 @@ import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.entity.enums.ERole;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.request.LoginRequest;
+import ru.veselov.instazoo.payload.request.RefreshTokenRequest;
 import ru.veselov.instazoo.payload.request.SignUpRequest;
+import ru.veselov.instazoo.payload.response.AuthResponse;
 
 import java.util.HashSet;
 import java.util.List;
@@ -116,5 +118,15 @@ public class TestUtils {
         user.setEmail(Constants.EMAIL);
         user.setId(Constants.ANY_ID);
         return user;
+    }
+
+    public static AuthResponse getAuthResponse() {
+        return new AuthResponse(true, "token", "refreshToken");
+    }
+
+    public static RefreshTokenRequest getRefreshTokenRequest() {
+        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
+        refreshTokenRequest.setRefreshToken("refreshToken");
+        return refreshTokenRequest;
     }
 }
