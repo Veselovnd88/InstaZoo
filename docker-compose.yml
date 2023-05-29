@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   backend:
     image: backend
@@ -11,11 +12,12 @@ services:
       - database_zoo
 
   database_zoo:
+    container_name: database_zoo
     image: "postgres:15.2"
     restart: always
     env_file:
       - database.env
     ports:
-      - "5436:5432"
+      - "5432:5432"
     volumes:
       - /var/docker-volumes/postgres-data-zoo:/var/lib/postgresql/data/

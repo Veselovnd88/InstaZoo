@@ -13,7 +13,7 @@ security:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5436/instazoo
+    url: jdbc:postgresql://database_zoo:5432/instazoo
     username: admin
     password: admin
   jpa:
