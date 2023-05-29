@@ -3,7 +3,6 @@ package ru.veselov.instazoo.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.veselov.instazoo.dto.CommentDTO;
 import ru.veselov.instazoo.model.Comment;
+import ru.veselov.instazoo.payload.response.ResponseMessage;
 import ru.veselov.instazoo.service.CommentService;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
@@ -48,9 +48,9 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}/delete")
-    public ResponseEntity<String> deleteComment(@PathVariable("commentId") String commentId) {
+    public ResponseMessage deleteComment(@PathVariable("commentId") String commentId) {
         commentService.deleteComment(Long.parseLong(commentId));
-        return ResponseEntity.ok(String.format("Comment %s deleted", commentId));
+        return new ResponseMessage(String.format("Comment %s deleted", commentId));
     }
 
 }

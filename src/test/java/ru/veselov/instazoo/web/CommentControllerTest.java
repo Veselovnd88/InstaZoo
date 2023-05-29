@@ -2,74 +2,67 @@ package ru.veselov.instazoo.web;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.test.context.ActiveProfiles;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import ru.veselov.instazoo.dto.CommentDTO;
-import ru.veselov.instazoo.model.User;
-import ru.veselov.instazoo.repository.UserRepository;
-import ru.veselov.instazoo.security.JwtProvider;
+import ru.veselov.instazoo.model.Comment;
 import ru.veselov.instazoo.service.CommentService;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
-import java.security.Principal;
-import java.util.Optional;
+import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 class CommentControllerTest {
 
-    @Autowired
     WebTestClient webTestClient;
 
-    @Autowired
-    JwtProvider jwtProvider;
-
-    @MockBean
+    @Mock
     CommentService commentService;
 
-    @MockBean
+    @Mock
     FieldErrorResponseService fieldErrorResponseService;
 
-    @MockBean
-    UserRepository userRepository;
-
-    User user;
-
-    String header;
+    @InjectMocks
+    CommentController commentController;
 
     @BeforeEach
     void init() {
-        user = TestUtils.getUser();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, "Pass");
-        String jwt = jwtProvider.generateToken(token);
-        header = "Bearer " + jwt;
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(Optional.of(TestUtils.getUserEntity()));
+        webTestClient = MockMvcWebTestClient.bindToController(commentController).build();
     }
 
     @Test
     void shouldCallCommentServiceToCreateComment() {
         CommentDTO commentDTO = TestUtils.getCommentDTO();
+        Comment comment = TestUtils.getComment();
         String postId = Constants.ANY_ID.toString();
+        Mockito.when(commentService.saveComment(
+                ArgumentMatchers.any(),
+                ArgumentMatchers.any(),
+                ArgumentMatchers.any()
+        )).thenReturn(comment);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path("/api/comment/" + postId).path("/create").build())
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
                 .bodyValue(commentDTO)
-                .exchange().expectStatus().isCreated();
+                .exchange().expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.username").isEqualTo(comment.getUsername())
+                .jsonPath("$.id").isEqualTo(comment.getId())
+                .jsonPath("$.postId").isEqualTo(comment.getPostId())
+                .jsonPath("$.userId").isEqualTo(comment.getUserId())
+                .jsonPath("$.message").isEqualTo(comment.getMessage());
 
         Mockito.verify(commentService, Mockito.times(1)).saveComment(
-                ArgumentMatchers.any(Long.class),
-                ArgumentMatchers.any(CommentDTO.class),
-                ArgumentMatchers.any(Principal.class)
+                ArgumentMatchers.any(),
+                ArgumentMatchers.any(),
+                ArgumentMatchers.any()
         );
         Mockito.verify(fieldErrorResponseService, Mockito.times(1)).validateFields(ArgumentMatchers.any());
     }
@@ -77,10 +70,19 @@ class CommentControllerTest {
     @Test
     void shouldCallCommentServiceToGetAllCommentsToPost() {
         String postId = Constants.ANY_ID.toString();
+        Mockito.when(commentService.getAllCommentsForPost(Constants.ANY_ID)).thenReturn(List.of(
+                TestUtils.getComment(),
+                TestUtils.getComment()
+        ));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/comment/" + postId).build())
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
-                .exchange().expectStatus().isOk();
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").isArray()
+                .jsonPath("$").isNotEmpty()
+                .jsonPath("$[0]").isEqualTo(TestUtils.getComment())
+                .jsonPath("$[1]").isEqualTo(TestUtils.getComment())
+                .jsonPath("$[2]").doesNotExist();
+
 
         Mockito.verify(commentService, Mockito.times(1)).getAllCommentsForPost(Constants.ANY_ID);
     }
@@ -90,8 +92,9 @@ class CommentControllerTest {
         String commentId = Constants.ANY_ID.toString();
 
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/api/comment/" + commentId).path("/delete").build())
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
-                .exchange().expectStatus().isOk();
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").exists()
+                .jsonPath("$.message").isEqualTo(String.format("Comment %s deleted", Constants.ANY_ID));
 
         Mockito.verify(commentService, Mockito.times(1)).deleteComment(Constants.ANY_ID);
     }

@@ -17,7 +17,6 @@ import ru.veselov.instazoo.payload.request.LoginRequest;
 import ru.veselov.instazoo.payload.response.AuthResponse;
 import ru.veselov.instazoo.security.JwtProvider;
 import ru.veselov.instazoo.security.SecurityProperties;
-import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 
 import static org.mockito.Mockito.times;
@@ -42,11 +41,7 @@ class AuthenticationServiceImplTest {
 
     @BeforeEach
     void init() {
-        SecurityProperties securityProperties = new SecurityProperties();
-        securityProperties.setHeader(Constants.AUTH_HEADER);
-        securityProperties.setPrefix(Constants.BEARER_PREFIX);
-        securityProperties.setSecret(Constants.SECRET);
-        securityProperties.setExpirationTime(Constants.EXPIRATION_TIME);
+        SecurityProperties securityProperties = TestUtils.getSecurityProperties();
         ReflectionTestUtils.setField(
                 authenticationService,
                 "securityProperties",

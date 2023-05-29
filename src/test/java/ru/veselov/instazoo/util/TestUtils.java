@@ -8,11 +8,13 @@ import ru.veselov.instazoo.entity.ImageEntity;
 import ru.veselov.instazoo.entity.PostEntity;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.entity.enums.ERole;
+import ru.veselov.instazoo.model.Comment;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.request.LoginRequest;
 import ru.veselov.instazoo.payload.request.RefreshTokenRequest;
 import ru.veselov.instazoo.payload.request.SignUpRequest;
 import ru.veselov.instazoo.payload.response.AuthResponse;
+import ru.veselov.instazoo.security.SecurityProperties;
 
 import java.util.HashSet;
 import java.util.List;
@@ -102,6 +104,16 @@ public class TestUtils {
         return commentEntity;
     }
 
+    public static Comment getComment() {
+        Comment comment = new Comment();
+        comment.setPostId(Constants.ANY_ID);
+        comment.setUsername(Constants.USERNAME);
+        comment.setMessage(Constants.COMMENT_MESSAGE);
+        comment.setUserId(Constants.ANY_ID);
+        comment.setId(Constants.ANY_ID);
+        return comment;
+    }
+
     public static ImageEntity getImageEntity() {
         ImageEntity imageEntity = new ImageEntity();
         imageEntity.setImageBytes(new byte[]{1, 2, 3, 4});
@@ -128,5 +140,14 @@ public class TestUtils {
         RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
         refreshTokenRequest.setRefreshToken("refreshToken");
         return refreshTokenRequest;
+    }
+
+    public static SecurityProperties getSecurityProperties() {
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setHeader(Constants.AUTH_HEADER);
+        securityProperties.setPrefix(Constants.BEARER_PREFIX);
+        securityProperties.setSecret(Constants.SECRET);
+        securityProperties.setExpirationTime(Constants.EXPIRATION_TIME);
+        return securityProperties;
     }
 }
