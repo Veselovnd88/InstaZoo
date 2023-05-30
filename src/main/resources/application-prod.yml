@@ -3,7 +3,7 @@ server:
   error:
     path: /api/error
 
-security:
+auth:
   secret: ${SECURITY_KEY}
   prefix: "Bearer "
   header: "Authorization"

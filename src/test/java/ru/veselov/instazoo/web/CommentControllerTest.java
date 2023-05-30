@@ -49,7 +49,9 @@ class CommentControllerTest {
                 ArgumentMatchers.any()
         )).thenReturn(comment);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path("/api/comment/" + postId).path("/create").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "comment/" + postId)
+                        .path("/create").build())
                 .bodyValue(commentDTO)
                 .exchange().expectStatus().isCreated()
                 .expectBody()
@@ -75,7 +77,7 @@ class CommentControllerTest {
                 TestUtils.getComment()
         ));
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/comment/" + postId).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "comment/" + postId).build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$").isNotEmpty()
@@ -91,7 +93,9 @@ class CommentControllerTest {
     void shouldCallCommentServiceToDeleteComment() {
         String commentId = Constants.ANY_ID.toString();
 
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/api/comment/" + commentId).path("/delete").build())
+        webTestClient.delete().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "comment/" + commentId)
+                        .path("/delete").build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").exists()
                 .jsonPath("$.message").isEqualTo(String.format("Comment %s deleted", Constants.ANY_ID));

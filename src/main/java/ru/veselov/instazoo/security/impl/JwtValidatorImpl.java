@@ -13,7 +13,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import ru.veselov.instazoo.security.JwtUtil;
 import ru.veselov.instazoo.security.JwtValidator;
-import ru.veselov.instazoo.security.SecurityProperties;
+import ru.veselov.instazoo.security.AuthProperties;
 
 @Service
 @RequiredArgsConstructor
@@ -22,13 +22,13 @@ public class JwtValidatorImpl implements JwtValidator {
 
     public static final String REFRESH = "refresh";
 
-    private final SecurityProperties securityProperties;
+    private final AuthProperties authProperties;
 
     @Override
     public boolean validateAccessToken(String token) {
         try {
             Claims body = Jwts.parserBuilder()
-                    .setSigningKey(JwtUtil.getKey(securityProperties.getSecret()))
+                    .setSigningKey(JwtUtil.getKey(authProperties.getSecret()))
                     .build().parseClaimsJws(token).getBody();
             return ObjectUtils.isEmpty(body.get(REFRESH));
         } catch (SignatureException |
@@ -46,7 +46,7 @@ public class JwtValidatorImpl implements JwtValidator {
     public boolean validateRefreshToken(String token) {
         try {
             Claims body = Jwts.parserBuilder()
-                    .setSigningKey(JwtUtil.getKey(securityProperties.getSecret()))
+                    .setSigningKey(JwtUtil.getKey(authProperties.getSecret()))
                     .build().parseClaimsJws(token).getBody();
             return !ObjectUtils.isEmpty(body.get(REFRESH));
         } catch (JwtException | IllegalArgumentException exception) {

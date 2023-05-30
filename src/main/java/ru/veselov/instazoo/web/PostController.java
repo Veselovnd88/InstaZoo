@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/post")
+@RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
 public class PostController {
 

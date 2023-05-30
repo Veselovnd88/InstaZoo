@@ -16,7 +16,7 @@ import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.response.AuthResponse;
 import ru.veselov.instazoo.security.JwtProvider;
 import ru.veselov.instazoo.security.JwtValidator;
-import ru.veselov.instazoo.security.SecurityProperties;
+import ru.veselov.instazoo.security.AuthProperties;
 import ru.veselov.instazoo.service.CustomUserDetailsService;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
@@ -42,17 +42,17 @@ class RefreshTokenServiceImplTest {
 
     @BeforeEach
     void init() {
-        SecurityProperties securityProperties = new SecurityProperties();
-        securityProperties.setHeader(Constants.AUTH_HEADER);
-        securityProperties.setPrefix(Constants.BEARER_PREFIX);
-        securityProperties.setSecret(Constants.SECRET);
-        securityProperties.setExpirationTime(Constants.EXPIRATION_TIME);
-        securityProperties.setExpirationTime(Constants.EXPIRATION_REFRESH_TIME);
+        AuthProperties authProperties = new AuthProperties();
+        authProperties.setHeader(Constants.AUTH_HEADER);
+        authProperties.setPrefix(Constants.BEARER_PREFIX);
+        authProperties.setSecret(Constants.SECRET);
+        authProperties.setExpirationTime(Constants.EXPIRATION_TIME);
+        authProperties.setExpirationTime(Constants.EXPIRATION_REFRESH_TIME);
         ReflectionTestUtils.setField(
                 refreshTokenService,
                 "securityProperties",
-                securityProperties,
-                SecurityProperties.class);
+                authProperties,
+                AuthProperties.class);
         user = TestUtils.getUser();
         token = "token";
     }

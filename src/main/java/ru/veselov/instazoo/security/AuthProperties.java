@@ -6,10 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "security")
+@ConfigurationProperties(prefix = "auth")
 @Getter
 @Setter
-public class SecurityProperties {
+public class AuthProperties {
 
     private String secret;
 

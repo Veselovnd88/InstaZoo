@@ -19,7 +19,7 @@ import java.security.Principal;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/image")
+@RequestMapping("/api/v1/image")
 @RequiredArgsConstructor
 public class ImageController {
 

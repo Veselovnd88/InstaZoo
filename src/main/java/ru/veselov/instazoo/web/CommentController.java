@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/comment")
+@RequestMapping("/api/v1/comment")
 @RequiredArgsConstructor
 public class CommentController {
 

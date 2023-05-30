@@ -17,6 +17,7 @@ import ru.veselov.instazoo.payload.response.AuthResponse;
 import ru.veselov.instazoo.service.AuthenticationService;
 import ru.veselov.instazoo.service.RefreshTokenService;
 import ru.veselov.instazoo.service.UserService;
+import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
@@ -42,7 +43,8 @@ class AuthControllerTest {
 
     @BeforeEach
     void init() {
-        webTestClient = MockMvcWebTestClient.bindToController(authController).build();
+        webTestClient = MockMvcWebTestClient.bindToController(authController)
+                .build();
     }
 
     @Test
@@ -51,7 +53,7 @@ class AuthControllerTest {
         AuthResponse authResponse = TestUtils.getAuthResponse();
         Mockito.when(authenticationService.authenticate(loginRequest)).thenReturn(authResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path("/api/auth/signin").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/signin").build())
                 .bodyValue(loginRequest)
                 .exchange().expectStatus().isAccepted()
                 .expectBody().jsonPath("$").exists()
@@ -67,7 +69,7 @@ class AuthControllerTest {
     void shouldRegisterUser() {
         SignUpRequest signUpRequest = TestUtils.getSignUpRequest();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path("/api/auth/signup").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/signup").build())
                 .bodyValue(signUpRequest)
                 .exchange().expectStatus().isCreated()
                 .expectBody().jsonPath("$").exists()
@@ -84,7 +86,7 @@ class AuthControllerTest {
         Mockito.when(refreshTokenService.processRefreshToken(refreshTokenRequest.getRefreshToken()))
                 .thenReturn(authResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path("/api/auth/refresh-token").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/refresh-token").build())
                 .bodyValue(refreshTokenRequest)
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").exists()

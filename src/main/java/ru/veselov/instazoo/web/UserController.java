@@ -21,7 +21,7 @@ import ru.veselov.instazoo.validation.FieldErrorResponseService;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/v1/user")
 @CrossOrigin
 @RequiredArgsConstructor
 public class UserController {

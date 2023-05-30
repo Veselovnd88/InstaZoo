@@ -22,12 +22,12 @@ JwtProvider {
 
     public static final String REFRESH = "refresh";
 
-    private final SecurityProperties securityProperties;
+    private final AuthProperties authProperties;
 
     public String generateToken(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         Date now = new Date(System.currentTimeMillis());
-        Date expired = new Date(now.getTime() + securityProperties.getExpirationTime());
+        Date expired = new Date(now.getTime() + authProperties.getExpirationTime());
         String userId = user.getId().toString();
 
         Map<String, Object> claimsMap = new HashMap<>();
@@ -40,14 +40,14 @@ JwtProvider {
                 .addClaims(claimsMap)
                 .setIssuedAt(now)
                 .setExpiration(expired)
-                .signWith(JwtUtil.getKey(securityProperties.getSecret()))
+                .signWith(JwtUtil.getKey(authProperties.getSecret()))
                 .compact();
     }
 
     public String generateRefreshToken(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         Date now = new Date(System.currentTimeMillis());
-        Date expired = new Date(now.getTime() + securityProperties.getRefreshExpirationTime());
+        Date expired = new Date(now.getTime() + authProperties.getRefreshExpirationTime());
         String userId = user.getId().toString();
         Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("id", userId);
@@ -57,12 +57,12 @@ JwtProvider {
                 .addClaims(claimsMap)
                 .setIssuedAt(now)
                 .setExpiration(expired)
-                .signWith(JwtUtil.getKey(securityProperties.getSecret()))
+                .signWith(JwtUtil.getKey(authProperties.getSecret()))
                 .compact();
     }
 
     public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(JwtUtil.getKey(securityProperties.getSecret())).build()
+        Claims claims = Jwts.parserBuilder().setSigningKey(JwtUtil.getKey(authProperties.getSecret())).build()
                 .parseClaimsJws(token).getBody();
         String id = claims.get("id", String.class);
         log.info("Retrieved [id {}] from jwt", id);
@@ -70,7 +70,7 @@ JwtProvider {
     }
 
     public boolean isRefreshTokenExpiredSoon(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(JwtUtil.getKey(securityProperties.getSecret())).build()
+        Claims claims = Jwts.parserBuilder().setSigningKey(JwtUtil.getKey(authProperties.getSecret())).build()
                 .parseClaimsJws(token).getBody();
         Date expiration = claims.getExpiration();
         Instant plus = Instant.now().plus(3, ChronoUnit.HOURS);

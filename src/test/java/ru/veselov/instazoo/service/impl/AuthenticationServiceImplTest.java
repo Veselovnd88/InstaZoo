@@ -16,7 +16,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.instazoo.payload.request.LoginRequest;
 import ru.veselov.instazoo.payload.response.AuthResponse;
 import ru.veselov.instazoo.security.JwtProvider;
-import ru.veselov.instazoo.security.SecurityProperties;
+import ru.veselov.instazoo.security.AuthProperties;
 import ru.veselov.instazoo.util.TestUtils;
 
 import static org.mockito.Mockito.times;
@@ -41,12 +41,12 @@ class AuthenticationServiceImplTest {
 
     @BeforeEach
     void init() {
-        SecurityProperties securityProperties = TestUtils.getSecurityProperties();
+        AuthProperties authProperties = TestUtils.getSecurityProperties();
         ReflectionTestUtils.setField(
                 authenticationService,
                 "securityProperties",
-                securityProperties,
-                SecurityProperties.class);
+                authProperties,
+                AuthProperties.class);
     }
 
     @Test

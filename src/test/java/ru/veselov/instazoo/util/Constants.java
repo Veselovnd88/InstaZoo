@@ -36,4 +36,6 @@ public class Constants {
 
     public static final String IMAGE_NAME = "Best photo ever";
 
+    public static final String PREFIX_URL = "/api/v1/";
+
 }

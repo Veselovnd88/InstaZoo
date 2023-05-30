@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.security.JwtProvider;
-import ru.veselov.instazoo.security.SecurityProperties;
+import ru.veselov.instazoo.security.AuthProperties;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 
@@ -20,7 +20,7 @@ class JwtValidatorImplTest {
 
     JwtProvider jwtProvider;
 
-    SecurityProperties securityProperties;
+    AuthProperties authProperties;
 
     User user;
 
@@ -28,15 +28,15 @@ class JwtValidatorImplTest {
 
     @BeforeEach
     void init() {
-        securityProperties = new SecurityProperties();
-        securityProperties.setHeader(Constants.AUTH_HEADER);
-        securityProperties.setPrefix(Constants.BEARER_PREFIX);
-        securityProperties.setSecret(Constants.SECRET);
-        securityProperties.setExpirationTime(Constants.EXPIRATION_TIME);
-        securityProperties.setRefreshExpirationTime(Constants.EXPIRATION_REFRESH_TIME);
-        jwtValidator = new JwtValidatorImpl(securityProperties);
+        authProperties = new AuthProperties();
+        authProperties.setHeader(Constants.AUTH_HEADER);
+        authProperties.setPrefix(Constants.BEARER_PREFIX);
+        authProperties.setSecret(Constants.SECRET);
+        authProperties.setExpirationTime(Constants.EXPIRATION_TIME);
+        authProperties.setRefreshExpirationTime(Constants.EXPIRATION_REFRESH_TIME);
+        jwtValidator = new JwtValidatorImpl(authProperties);
         user = TestUtils.getUser();
-        jwtProvider = new JwtProvider(securityProperties);
+        jwtProvider = new JwtProvider(authProperties);
         auth = new UsernamePasswordAuthenticationToken(user, "Pass");
     }
 
@@ -60,7 +60,7 @@ class JwtValidatorImplTest {
 
     @Test
     void shouldThrowExpiredJwtException() {
-        securityProperties.setExpirationTime(1L);
+        authProperties.setExpirationTime(1L);
         String token = jwtProvider.generateToken(auth);
 
         Assertions.assertThatThrownBy(() -> jwtValidator.validateAccessToken(token))
@@ -85,7 +85,7 @@ class JwtValidatorImplTest {
         Assertions.assertThat(isValid).isFalse();
 
         //Second check also for expired refresh token
-        securityProperties.setRefreshExpirationTime(1L);
+        authProperties.setRefreshExpirationTime(1L);
         token = jwtProvider.generateRefreshToken(auth);
 
         isValid = jwtValidator.validateRefreshToken(token);

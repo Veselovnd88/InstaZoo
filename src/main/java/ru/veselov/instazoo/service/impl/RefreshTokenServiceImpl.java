@@ -9,7 +9,7 @@ import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.response.AuthResponse;
 import ru.veselov.instazoo.security.JwtProvider;
 import ru.veselov.instazoo.security.JwtValidator;
-import ru.veselov.instazoo.security.SecurityProperties;
+import ru.veselov.instazoo.security.AuthProperties;
 import ru.veselov.instazoo.service.CustomUserDetailsService;
 import ru.veselov.instazoo.service.RefreshTokenService;
 
@@ -26,7 +26,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final CustomUserDetailsService userDetailsService;
 
-    private final SecurityProperties securityProperties;
+    private final AuthProperties authProperties;
 
     @Override
     public AuthResponse processRefreshToken(String refreshToken) {
@@ -37,7 +37,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     user, null, Collections.emptyList()
             );
-            String jwt = securityProperties.getPrefix() + jwtProvider.generateToken(authenticationToken);
+            String jwt = authProperties.getPrefix() + jwtProvider.generateToken(authenticationToken);
             if (jwtProvider.isRefreshTokenExpiredSoon(refreshToken)) {
                 refreshToken = jwtProvider.generateRefreshToken(authenticationToken);
                 log.info("Refresh token expired after 3 hours, replaced to the new one");

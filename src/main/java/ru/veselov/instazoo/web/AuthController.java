@@ -22,7 +22,7 @@ import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @PreAuthorize("permitAll")
 @RequiredArgsConstructor
 public class AuthController {

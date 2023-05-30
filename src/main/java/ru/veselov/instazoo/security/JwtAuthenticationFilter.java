@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtValidator jwtValidator;
 
-    private final SecurityProperties securityProperties;
+    private final AuthProperties authProperties;
 
     @Qualifier("handlerExceptionResolver")
     private final HandlerExceptionResolver handlerExceptionResolver;
@@ -42,11 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public JwtAuthenticationFilter(JwtProvider jwtProvider,
                                    JwtValidator jwtValidator,
                                    CustomUserDetailsService userDetailsService,
-                                   SecurityProperties securityProperties,
+                                   AuthProperties authProperties,
                                    HandlerExceptionResolver handlerExceptionResolver) {
         this.jwtProvider = jwtProvider;
         this.userDetailsService = userDetailsService;
-        this.securityProperties = securityProperties;
+        this.authProperties = authProperties;
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.jwtValidator = jwtValidator;
     }
@@ -83,10 +83,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Optional<String> getJwtFromRequest(HttpServletRequest request) {
-        String bearToken = request.getHeader(securityProperties.getHeader());
-        if (StringUtils.isNotBlank(bearToken) && bearToken.startsWith(securityProperties.getPrefix())) {
+        String bearToken = request.getHeader(authProperties.getHeader());
+        if (StringUtils.isNotBlank(bearToken) && bearToken.startsWith(authProperties.getPrefix())) {
             return
-                    Optional.of(bearToken.substring(securityProperties.getPrefix().length()));
+                    Optional.of(bearToken.substring(authProperties.getPrefix().length()));
         }
         return Optional.empty();
     }

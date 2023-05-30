@@ -14,7 +14,7 @@ import ru.veselov.instazoo.payload.request.LoginRequest;
 import ru.veselov.instazoo.payload.request.RefreshTokenRequest;
 import ru.veselov.instazoo.payload.request.SignUpRequest;
 import ru.veselov.instazoo.payload.response.AuthResponse;
-import ru.veselov.instazoo.security.SecurityProperties;
+import ru.veselov.instazoo.security.AuthProperties;
 
 import java.util.HashSet;
 import java.util.List;
@@ -142,12 +142,12 @@ public class TestUtils {
         return refreshTokenRequest;
     }
 
-    public static SecurityProperties getSecurityProperties() {
-        SecurityProperties securityProperties = new SecurityProperties();
-        securityProperties.setHeader(Constants.AUTH_HEADER);
-        securityProperties.setPrefix(Constants.BEARER_PREFIX);
-        securityProperties.setSecret(Constants.SECRET);
-        securityProperties.setExpirationTime(Constants.EXPIRATION_TIME);
-        return securityProperties;
+    public static AuthProperties getSecurityProperties() {
+        AuthProperties authProperties = new AuthProperties();
+        authProperties.setHeader(Constants.AUTH_HEADER);
+        authProperties.setPrefix(Constants.BEARER_PREFIX);
+        authProperties.setSecret(Constants.SECRET);
+        authProperties.setExpirationTime(Constants.EXPIRATION_TIME);
+        return authProperties;
     }
 }
