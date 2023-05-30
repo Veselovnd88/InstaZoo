@@ -15,6 +15,7 @@ import ru.veselov.instazoo.payload.request.LoginRequest;
 import ru.veselov.instazoo.payload.request.RefreshTokenRequest;
 import ru.veselov.instazoo.payload.request.SignUpRequest;
 import ru.veselov.instazoo.payload.response.AuthResponse;
+import ru.veselov.instazoo.payload.response.ResponseMessage;
 import ru.veselov.instazoo.service.AuthenticationService;
 import ru.veselov.instazoo.service.RefreshTokenService;
 import ru.veselov.instazoo.service.UserService;
@@ -44,10 +45,10 @@ public class AuthController {
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
-    public String registerUser(@Valid @RequestBody SignUpRequest signUp, BindingResult result) {
+    public ResponseMessage registerUser(@Valid @RequestBody SignUpRequest signUp, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
         userService.createUser(signUp);
-        return "User successfully registered";
+        return new ResponseMessage("User successfully registered");
     }
 
     @PostMapping("/refresh-token")

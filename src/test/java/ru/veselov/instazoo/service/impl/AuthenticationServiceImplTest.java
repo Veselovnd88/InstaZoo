@@ -44,7 +44,7 @@ class AuthenticationServiceImplTest {
         AuthProperties authProperties = TestUtils.getSecurityProperties();
         ReflectionTestUtils.setField(
                 authenticationService,
-                "securityProperties",
+                "authProperties",
                 authProperties,
                 AuthProperties.class);
     }

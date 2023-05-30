@@ -1,73 +1,59 @@
 package ru.veselov.instazoo.web;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.multipart.MultipartFile;
-import ru.veselov.instazoo.model.User;
-import ru.veselov.instazoo.repository.UserRepository;
-import ru.veselov.instazoo.security.JwtProvider;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.veselov.instazoo.model.ImageModel;
 import ru.veselov.instazoo.service.ImageService;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 
-import java.security.Principal;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 class ImageControllerTest {
 
-    @Autowired
     MockMvc mockMvc;
 
-    @Autowired
-    JwtProvider jwtProvider;
-
-    @MockBean
+    @Mock
     ImageService imageService;
 
-    @MockBean
-    UserRepository userRepository;
-
-    User user;
-
-    String header;
+    @InjectMocks
+    ImageController imageController;
 
     @BeforeEach
     void init() {
-        user = TestUtils.getUser();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, "Pass");
-        String jwt = jwtProvider.generateToken(token);
-        header = "Bearer " + jwt;
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(Optional.of(TestUtils.getUserEntity()));
+        mockMvc = MockMvcBuilders.standaloneSetup(imageController).build();
     }
 
     @Test
     void shouldCallImageServiceToUploadImageToUser() throws Exception {
         MockMultipartFile multipartFile = new MockMultipartFile("file", new byte[]{1, 2, 3});
         MockMultipartHttpServletRequestBuilder file = MockMvcRequestBuilders
-                .multipart("/api/image/upload").file(multipartFile);
+                .multipart(Constants.PREFIX_URL + "image/upload").file(multipartFile);
 
-        mockMvc.perform(file.header(Constants.AUTH_HEADER, header))
-                .andExpect(MockMvcResultMatchers.status().isAccepted());
+        mockMvc.perform(file)
+                .andExpect(MockMvcResultMatchers.status().isAccepted())
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message").exists()).andExpect(
+                        MockMvcResultMatchers.jsonPath("$.message").value(Matchers.containsString("Image"))
+                );
 
         Mockito.verify(imageService, Mockito.times(1)).uploadImageToUser(
-                ArgumentMatchers.any(MultipartFile.class),
-                ArgumentMatchers.any(Principal.class)
+                ArgumentMatchers.any(),
+                ArgumentMatchers.any()
         );
     }
 
@@ -76,34 +62,61 @@ class ImageControllerTest {
         String postId = Constants.ANY_ID.toString();
         MockMultipartFile multipartFile = new MockMultipartFile("file", new byte[]{1, 2, 3});
         MockMultipartHttpServletRequestBuilder file = MockMvcRequestBuilders
-                .multipart("/api/image/" + postId + "/upload").file(multipartFile);
+                .multipart(Constants.PREFIX_URL + "image/" + postId + "/upload").file(multipartFile);
 
-        mockMvc.perform(file.header(Constants.AUTH_HEADER, header))
-                .andExpect(MockMvcResultMatchers.status().isAccepted());
+        mockMvc.perform(file)
+                .andExpect(MockMvcResultMatchers.status().isAccepted())
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                        .value(Matchers.containsString("Image"))
+                );
 
         Mockito.verify(imageService, Mockito.times(1)).uploadImageToPost(
-                ArgumentMatchers.any(MultipartFile.class),
-                ArgumentMatchers.any(Principal.class),
-                ArgumentMatchers.any(Long.class)
+                ArgumentMatchers.any(),
+                ArgumentMatchers.any(),
+                ArgumentMatchers.any()
         );
     }
 
     @Test
     void shouldCallImageServiceToGetAllProfileImage() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/image/profile")
-                        .header(Constants.AUTH_HEADER, header))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        ImageModel imageModel = TestUtils.getImageModel();
+        Mockito.when(imageService.getImageToUser(ArgumentMatchers.any())).thenReturn(imageModel);
 
-        Mockito.verify(imageService, Mockito.times(1)).getImageToUser(ArgumentMatchers.any(Principal.class));
+        mockMvc.perform(MockMvcRequestBuilders.get(Constants.PREFIX_URL + "/image/profile"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name")
+                        .value(Matchers.containsString(imageModel.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id")
+                        .value(Matchers.hasToString(imageModel.getId().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.createdAt")
+                        .value(Matchers.containsString(
+                                imageModel.getCreatedAt()
+                                        .format(DateTimeFormatter.ofPattern("yyyy-mm-dd HH:mm:ss")))));
+
+        Mockito.verify(imageService, Mockito.times(1)).getImageToUser(ArgumentMatchers.any());
     }
 
     @Test
     void shouldCallImageServiceToGetPostImage() throws Exception {
         String postId = Constants.ANY_ID.toString();
+        ImageModel imageModel = TestUtils.getImageModel();
+        Mockito.when(imageService.getImageToPost(ArgumentMatchers.any())).thenReturn(imageModel);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/image/post/" + postId)
-                        .header(Constants.AUTH_HEADER, header))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.get(Constants.PREFIX_URL + "image/post/" + postId))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name")
+                        .value(Matchers.containsString(imageModel.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id")
+                        .value(Matchers.hasToString(imageModel.getId().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.createdAt")
+                        .value(Matchers.containsString(
+                                imageModel.getCreatedAt()
+                                        .format(DateTimeFormatter.ofPattern("yyyy-mm-dd HH:mm:ss")))));
+
 
         Mockito.verify(imageService, Mockito.times(1)).getImageToPost(Constants.ANY_ID);
     }

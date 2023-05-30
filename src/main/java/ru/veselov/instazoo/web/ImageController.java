@@ -2,17 +2,10 @@ package ru.veselov.instazoo.web;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.instazoo.model.ImageModel;
+import ru.veselov.instazoo.payload.response.ResponseMessage;
 import ru.veselov.instazoo.service.ImageService;
 
 import java.security.Principal;
@@ -27,20 +20,21 @@ public class ImageController {
 
     @PostMapping("/upload")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<String> uploadImageToUser(@RequestParam("file") MultipartFile multipartFile, Principal principal) {
+    public ResponseMessage uploadImageToUser(@RequestParam("file") MultipartFile multipartFile, Principal principal) {
         imageService.uploadImageToUser(multipartFile, principal);
-        return ResponseEntity.accepted().body("Image upload successfully");
+        return new ResponseMessage("Image upload successfully");
     }
 
     @PostMapping("/{postId}/upload")
-    public ResponseEntity<String> uploadImageToPost(@PathVariable("postId") String postId,
-                                                    @RequestParam("file") MultipartFile multipartFile,
-                                                    Principal principal) {
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseMessage uploadImageToPost(@PathVariable("postId") String postId,
+                                             @RequestParam("file") MultipartFile multipartFile,
+                                             Principal principal) {
         imageService.uploadImageToPost(multipartFile, principal, Long.parseLong(postId));
-        return ResponseEntity.accepted().body("Image upload successfully");
+        return new ResponseMessage("Image upload successfully");
     }
 
-    @GetMapping("/profile")
+    @GetMapping(value = "/profile")
     public ImageModel getProfileImage(Principal principal) {
         return imageService.getImageToUser(principal);
     }

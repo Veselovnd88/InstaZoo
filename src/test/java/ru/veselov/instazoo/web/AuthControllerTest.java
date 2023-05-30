@@ -88,7 +88,7 @@ class AuthControllerTest {
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/refresh-token").build())
                 .bodyValue(refreshTokenRequest)
-                .exchange().expectStatus().isOk()
+                .exchange().expectStatus().isAccepted()
                 .expectBody().jsonPath("$").exists()
                 .jsonPath("$.success").isEqualTo("true")
                 .jsonPath("$.token").isEqualTo(authResponse.getToken())

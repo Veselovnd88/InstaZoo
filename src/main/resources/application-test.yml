@@ -20,7 +20,7 @@ spring:
         show_sql: true
         format_sql: true
         hbm2ddl:
-          auto: create-drop
+          auto: none
   flyway:
     baseline-on-migrate: true
     locations: db/migration

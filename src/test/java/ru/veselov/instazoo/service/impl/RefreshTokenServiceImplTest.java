@@ -50,7 +50,7 @@ class RefreshTokenServiceImplTest {
         authProperties.setExpirationTime(Constants.EXPIRATION_REFRESH_TIME);
         ReflectionTestUtils.setField(
                 refreshTokenService,
-                "securityProperties",
+                "authProperties",
                 authProperties,
                 AuthProperties.class);
         user = TestUtils.getUser();

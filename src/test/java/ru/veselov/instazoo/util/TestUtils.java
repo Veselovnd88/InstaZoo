@@ -9,6 +9,7 @@ import ru.veselov.instazoo.entity.PostEntity;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.entity.enums.ERole;
 import ru.veselov.instazoo.model.Comment;
+import ru.veselov.instazoo.model.ImageModel;
 import ru.veselov.instazoo.model.Post;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.request.LoginRequest;
@@ -137,6 +138,15 @@ public class TestUtils {
         imageEntity.setPostId(Constants.ANY_ID);
         imageEntity.setUserId(Constants.ANY_ID);
         return imageEntity;
+    }
+
+    public static ImageModel getImageModel() {
+        ImageModel imageModel = new ImageModel();
+        imageModel.setId(Constants.ANY_ID);
+        imageModel.setImageBytes(new byte[]{1, 2, 3, 4});
+        imageModel.setName(Constants.IMAGE_NAME);
+        imageModel.setCreatedAt(LocalDateTime.now());
+        return imageModel;
     }
 
     public static User getUser() {
