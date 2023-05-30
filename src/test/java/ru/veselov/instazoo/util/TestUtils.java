@@ -9,6 +9,7 @@ import ru.veselov.instazoo.entity.PostEntity;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.entity.enums.ERole;
 import ru.veselov.instazoo.model.Comment;
+import ru.veselov.instazoo.model.Post;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.request.LoginRequest;
 import ru.veselov.instazoo.payload.request.RefreshTokenRequest;
@@ -16,6 +17,7 @@ import ru.veselov.instazoo.payload.request.SignUpRequest;
 import ru.veselov.instazoo.payload.response.AuthResponse;
 import ru.veselov.instazoo.security.AuthProperties;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -86,6 +88,20 @@ public class TestUtils {
                 commentEntity
         ));
         return postEntity;
+    }
+
+    public static Post getPost() {
+        Post post = new Post();
+        post.setUsername(Constants.USERNAME);
+        post.setCaption(Constants.POST_CAPTION);
+        post.setLikes(5);
+        post.setId(Constants.ANY_ID);
+        post.setLikedUsers(Set.of(
+                "dog1",
+                "dog2"
+        ));
+        post.setCreatedAt(LocalDateTime.now());
+        return post;
     }
 
     public static CommentDTO getCommentDTO() {

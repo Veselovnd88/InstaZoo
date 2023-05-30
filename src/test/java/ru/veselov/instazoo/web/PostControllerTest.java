@@ -1,116 +1,140 @@
 package ru.veselov.instazoo.web;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.test.context.ActiveProfiles;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.validation.BindingResult;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import ru.veselov.instazoo.dto.PostDTO;
-import ru.veselov.instazoo.model.User;
-import ru.veselov.instazoo.repository.UserRepository;
-import ru.veselov.instazoo.security.JwtProvider;
+import ru.veselov.instazoo.model.Post;
 import ru.veselov.instazoo.service.PostService;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
-import java.security.Principal;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 class PostControllerTest {
 
-    @Autowired
     WebTestClient webTestClient;
 
-    @Autowired
-    JwtProvider jwtProvider;
-
-    @MockBean
+    @Mock
     PostService postService;
 
-    @MockBean
+    @Mock
     FieldErrorResponseService fieldErrorResponseService;
 
-    @MockBean
-    UserRepository userRepository;
-
-    User user;
-
-    String header;
+    @InjectMocks
+    PostController postController;
 
     @BeforeEach
     void init() {
-        user = TestUtils.getUser();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, "Pass");
-        String jwt = jwtProvider.generateToken(token);
-        header = "Bearer " + jwt;
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(Optional.of(TestUtils.getUserEntity()));
+        webTestClient = MockMvcWebTestClient.bindToController(postController).build();
     }
 
     @Test
     void shouldCallPostServiceToCreatePost() {
         PostDTO postDTO = TestUtils.getPostDTO();
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path("/api/post/create").build())
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
+        Post post = TestUtils.getPost();
+        Mockito.when(postService.createPost(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(post);
+        WebTestClient.ResponseSpec created = webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "post/create").build())
                 .bodyValue(postDTO)
                 .exchange().expectStatus().isCreated();
 
-        Mockito.verify(postService, Mockito.times(1)).createPost(
-                ArgumentMatchers.any(PostDTO.class),
-                ArgumentMatchers.any(Principal.class));
-        Mockito.verify(fieldErrorResponseService, Mockito.times(1))
-                .validateFields(ArgumentMatchers.any(BindingResult.class));
+        checkBody(created, post);
+
+        Mockito.verify(postService, Mockito.times(1)).createPost(ArgumentMatchers.any(), ArgumentMatchers.any());
+        Mockito.verify(fieldErrorResponseService, Mockito.times(1)).validateFields(ArgumentMatchers.any());
     }
 
     @Test
     void shouldCallPostServiceToGeAllPosts() {
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/post/all").build())
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
-                .exchange().expectStatus().isOk();
+        Post post = TestUtils.getPost();
+        Mockito.when(postService.getAllPosts()).thenReturn(List.of(
+                post,
+                post
+        ));
+
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "post/all").build())
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").isArray()
+                .jsonPath("$[0]").exists()
+                .jsonPath("$[1]").exists()
+                .jsonPath("$[2]").doesNotExist()
+                .jsonPath("$[0]");
 
         Mockito.verify(postService, Mockito.times(1)).getAllPosts();
     }
 
     @Test
     void shouldCallPostServiceToGetAllPostsForUser() {
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/post").build())
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
-                .exchange().expectStatus().isOk();
+        Post post = TestUtils.getPost();
+        Mockito.when(postService.getAllPostsForUser(ArgumentMatchers.any())).thenReturn(List.of(
+                post,
+                post
+        ));
 
-        Mockito.verify(postService, Mockito.times(1)).getAllPostsForUser(ArgumentMatchers.any(Principal.class));
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "post").build())
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").isArray()
+                .jsonPath("$[0]").exists()
+                .jsonPath("$[1]").exists()
+                .jsonPath("$[2]").doesNotExist();
+
+        Mockito.verify(postService, Mockito.times(1)).getAllPostsForUser(ArgumentMatchers.any());
     }
 
     @Test
     void shouldCallPostServiceToLike() {
         String postId = Constants.ANY_ID.toString();
         String username = Constants.USERNAME;
-        webTestClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/api/post/" + postId + "/" + username).path("/like").build())
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
+        Post post = TestUtils.getPost();
+        Mockito.when(postService.likePost(Constants.ANY_ID, username)).thenReturn(post);
+
+        WebTestClient.ResponseSpec accepted = webTestClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "post/" + postId + "/" + username)
+                        .path("/like").build())
                 .exchange().expectStatus().isAccepted();
 
+        checkBody(accepted, post);
         Mockito.verify(postService, Mockito.times(1)).likePost(Constants.ANY_ID, username);
     }
 
     @Test
     void shouldCallPostServiceToDeletePost() {
         String postId = Constants.ANY_ID.toString();
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/api/post/" + postId).path("/delete").build())
-                .headers(httpHeaders -> httpHeaders.add(Constants.AUTH_HEADER, header))
-                .exchange().expectStatus().isOk();
+
+        webTestClient.delete().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "post/" + postId)
+                        .path("/delete").build())
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").exists()
+                .jsonPath("$.message").isEqualTo(String.format("Post %s deleted", postId));
 
         Mockito.verify(postService, Mockito.times(1)).deletePost(
-                ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Principal.class));
+                ArgumentMatchers.any(), ArgumentMatchers.any());
+    }
+
+    private void checkBody(WebTestClient.ResponseSpec spec, Post post) {
+        spec.expectBody().jsonPath("$").exists()
+                .jsonPath("$.id").isEqualTo(post.getId())
+                .jsonPath("$.username").isEqualTo(post.getUsername())
+                .jsonPath("$.caption").isEqualTo(post.getCaption())
+                .jsonPath("$.createdAt").isEqualTo(
+                        post.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-mm-dd HH:mm:ss")))
+                .jsonPath("$.likedUsers").isArray()
+                .jsonPath("$.likedUsers[0]").value(Matchers.containsString("dog"))
+                .jsonPath("$.likedUsers[1]").value(Matchers.containsString("dog"))
+                .jsonPath("$.likedUsers[2]").doesNotExist();
     }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.veselov.instazoo.dto.PostDTO;
 import ru.veselov.instazoo.model.Post;
+import ru.veselov.instazoo.payload.response.ResponseMessage;
 import ru.veselov.instazoo.service.PostService;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
@@ -57,9 +58,9 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}/delete")
-    public ResponseEntity<String> deletePost(@PathVariable("postId") String postId, Principal principal) {
+    public ResponseMessage deletePost(@PathVariable("postId") String postId, Principal principal) {
         postService.deletePost(Long.parseLong(postId), principal);
-        return ResponseEntity.ok(String.format("Post %s deleted", postId));
+        return new ResponseMessage(String.format("Post %s deleted", postId));
     }
 
 }
