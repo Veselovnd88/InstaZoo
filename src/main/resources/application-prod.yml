@@ -11,9 +11,6 @@ security:
   refresh-expiration-time: 18000000
 
 spring:
-  profiles:
-    active: local
-
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DATASOURCE_URL}

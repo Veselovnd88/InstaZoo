@@ -1,24 +1,21 @@
 server:
-  port: ${PORT}
+  port: 6667
   error:
     path: /api/error
 
 security:
-  secret: ${SECURITY_KEY}
+  secret: "D9D323C5E55F45C206D7880329B1721A4334C00F336E5F2F1E9DAB745FF44837"
   prefix: "Bearer "
   header: "Authorization"
   expiration-time: 600000
   refresh-expiration-time: 18000000
 
 spring:
-  profiles:
-    active: local
-
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DATASOURCE_URL}
-    username: ${DB_NAME}
-    password: ${DB_PASS}
+    url: jdbc:postgresql://localhost:5436/instazoo
+    username: admin
+    password: admin
   jpa:
     properties:
       hibernate:

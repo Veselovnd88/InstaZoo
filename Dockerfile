@@ -14,4 +14,4 @@ ARG JAR_FILE=build/libs/InstaZoo-0.0.1-SNAPSHOT.jar
 
 COPY --from=build /home/gradle/src/${JAR_FILE} /app/app.jar
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-Dspring.profiles.active=prod","-jar", "app.jar"]
