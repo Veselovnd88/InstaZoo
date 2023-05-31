@@ -48,25 +48,22 @@ class AuthControllerTest {
     }
 
     @Test
-    void shouldAuthenticateUser() {
+    void shouldAuthenticateUserAndReturnAuthResponse() {
         LoginRequest loginRequest = TestUtils.getLoginRequest();
         AuthResponse authResponse = TestUtils.getAuthResponse();
         Mockito.when(authenticationService.authenticate(loginRequest)).thenReturn(authResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/signin").build())
+        WebTestClient.ResponseSpec accepted = webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/signin").build())
                 .bodyValue(loginRequest)
-                .exchange().expectStatus().isAccepted()
-                .expectBody().jsonPath("$").exists()
-                .jsonPath("$.success").isEqualTo("true")
-                .jsonPath("$.token").isEqualTo(authResponse.getToken())
-                .jsonPath("$.refreshToken").isEqualTo(authResponse.getRefreshToken());
+                .exchange().expectStatus().isAccepted();
 
+        checkAuthResponseBody(accepted, authResponse);
         Mockito.verify(fieldErrorResponseService, Mockito.times(1)).validateFields(ArgumentMatchers.any());
         Mockito.verify(authenticationService, Mockito.times(1)).authenticate(loginRequest);
     }
 
     @Test
-    void shouldRegisterUser() {
+    void shouldRegisterUserAndReturnSuccessMessage() {
         SignUpRequest signUpRequest = TestUtils.getSignUpRequest();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/signup").build())
@@ -80,23 +77,27 @@ class AuthControllerTest {
     }
 
     @Test
-    void shouldReturnRefreshToken() {
+    void shouldReturnAuthResponseWithRefreshToken() {
         RefreshTokenRequest refreshTokenRequest = TestUtils.getRefreshTokenRequest();
         AuthResponse authResponse = TestUtils.getAuthResponse();
         Mockito.when(refreshTokenService.processRefreshToken(refreshTokenRequest.getRefreshToken()))
                 .thenReturn(authResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/refresh-token").build())
+        WebTestClient.ResponseSpec accepted = webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth/refresh-token").build())
                 .bodyValue(refreshTokenRequest)
-                .exchange().expectStatus().isAccepted()
-                .expectBody().jsonPath("$").exists()
-                .jsonPath("$.success").isEqualTo("true")
-                .jsonPath("$.token").isEqualTo(authResponse.getToken())
-                .jsonPath("$.refreshToken").isEqualTo(authResponse.getRefreshToken());
+                .exchange().expectStatus().isAccepted();
 
+        checkAuthResponseBody(accepted, authResponse);
         Mockito.verify(fieldErrorResponseService, Mockito.times(1)).validateFields(ArgumentMatchers.any());
         Mockito.verify(refreshTokenService, Mockito.times(1))
                 .processRefreshToken(refreshTokenRequest.getRefreshToken());
+    }
+
+    private void checkAuthResponseBody(WebTestClient.ResponseSpec responseSpec, AuthResponse authResponse) {
+        responseSpec.expectBody().jsonPath("$").exists()
+                .jsonPath("$.success").isEqualTo("true")
+                .jsonPath("$.token").isEqualTo(authResponse.getToken())
+                .jsonPath("$.refreshToken").isEqualTo(authResponse.getRefreshToken());
     }
 
 }
