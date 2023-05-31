@@ -7,9 +7,10 @@ import org.springframework.stereotype.Service;
 import ru.veselov.instazoo.exception.BadTokenException;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.payload.response.AuthResponse;
-import ru.veselov.instazoo.security.JwtProvider;
-import ru.veselov.instazoo.security.JwtValidator;
 import ru.veselov.instazoo.security.AuthProperties;
+import ru.veselov.instazoo.security.jwt.JwtGenerator;
+import ru.veselov.instazoo.security.jwt.JwtParser;
+import ru.veselov.instazoo.security.jwt.JwtValidator;
 import ru.veselov.instazoo.service.CustomUserDetailsService;
 import ru.veselov.instazoo.service.RefreshTokenService;
 
@@ -20,9 +21,11 @@ import java.util.Collections;
 @Slf4j
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
-    private final JwtProvider jwtProvider;
+    private final JwtGenerator jwtGenerator;
 
     private final JwtValidator jwtValidator;
+
+    private final JwtParser jwtParser;
 
     private final CustomUserDetailsService userDetailsService;
 
@@ -32,14 +35,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public AuthResponse processRefreshToken(String refreshToken) {
         if (jwtValidator.validateRefreshToken(refreshToken)) {
             log.info("Refresh token validated");
-            Long userId = jwtProvider.getUserIdFromToken(refreshToken);
+            Long userId = jwtParser.getUserIdFromToken(refreshToken);
             User user = userDetailsService.loadUserById(userId);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     user, null, Collections.emptyList()
             );
-            String jwt = authProperties.getPrefix() + jwtProvider.generateToken(authenticationToken);
-            if (jwtProvider.isRefreshTokenExpiredSoon(refreshToken)) {
-                refreshToken = jwtProvider.generateRefreshToken(authenticationToken);
+            String jwt = authProperties.getPrefix() + jwtGenerator.generateToken(authenticationToken);
+            if (jwtGenerator.isRefreshTokenExpiredSoon(refreshToken)) {
+                refreshToken = jwtGenerator.generateRefreshToken(authenticationToken);
                 log.info("Refresh token expired after 3 hours, replaced to the new one");
             }
             return new AuthResponse(true, jwt, refreshToken);

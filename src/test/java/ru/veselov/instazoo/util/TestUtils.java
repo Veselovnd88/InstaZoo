@@ -1,5 +1,6 @@
 package ru.veselov.instazoo.util;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import ru.veselov.instazoo.dto.CommentDTO;
 import ru.veselov.instazoo.dto.PostDTO;
 import ru.veselov.instazoo.dto.UserDTO;
@@ -151,10 +152,14 @@ public class TestUtils {
 
     public static User getUser() {
         User user = new User();
+        user.setUsername(Constants.USERNAME);
         user.setFirstname(Constants.FIRST_NAME);
         user.setLastname(Constants.LAST_NAME);
         user.setEmail(Constants.EMAIL);
         user.setId(Constants.ANY_ID);
+        user.setAuthorities(List.of(
+                new SimpleGrantedAuthority("BIG BOSS")
+        ));
         return user;
     }
 

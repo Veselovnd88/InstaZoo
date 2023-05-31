@@ -1,4 +1,4 @@
-package ru.veselov.instazoo.security;
+package ru.veselov.instazoo.security.jwt;
 
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

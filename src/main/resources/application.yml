@@ -1,9 +1,9 @@
 server:
   port: ${PORT}
   error:
-    path: /api/error
+    path: /api/v1/error
 
-security:
+auth:
   secret: ${SECURITY_KEY}
   prefix: "Bearer "
   header: "Authorization"

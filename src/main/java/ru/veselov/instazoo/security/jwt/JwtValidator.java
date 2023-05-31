@@ -1,4 +1,4 @@
-package ru.veselov.instazoo.security;
+package ru.veselov.instazoo.security.jwt;
 
 public interface JwtValidator {
 

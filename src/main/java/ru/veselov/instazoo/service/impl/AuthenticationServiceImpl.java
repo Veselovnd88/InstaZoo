@@ -9,8 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.veselov.instazoo.payload.request.LoginRequest;
 import ru.veselov.instazoo.payload.response.AuthResponse;
-import ru.veselov.instazoo.security.JwtProvider;
 import ru.veselov.instazoo.security.AuthProperties;
+import ru.veselov.instazoo.security.jwt.JwtGenerator;
 import ru.veselov.instazoo.service.AuthenticationService;
 
 @Service
@@ -20,7 +20,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
 
-    private final JwtProvider jwtProvider;
+    private final JwtGenerator jwtGenerator;
 
     private final AuthProperties authProperties;
 
@@ -32,8 +32,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
         Authentication authenticate = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(authenticate);
-        String jwt = authProperties.getPrefix() + jwtProvider.generateToken(authenticate);
-        String refreshToken = jwtProvider.generateRefreshToken(authenticate);
+        String jwt = authProperties.getPrefix() + jwtGenerator.generateToken(authenticate);
+        String refreshToken = jwtGenerator.generateRefreshToken(authenticate);
         log.info("[User {}] authenticated", login.getUsername());
         return new AuthResponse(true, jwt, refreshToken);
     }

@@ -1,7 +1,7 @@
 server:
   port: ${PORT}
   error:
-    path: /api/error
+    path: /api/v1/error
 
 auth:
   secret: ${SECURITY_KEY}

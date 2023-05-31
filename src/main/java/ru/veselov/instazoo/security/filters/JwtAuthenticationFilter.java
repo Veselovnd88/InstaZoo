@@ -1,4 +1,4 @@
-package ru.veselov.instazoo.security;
+package ru.veselov.instazoo.security.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,18 +11,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.veselov.instazoo.exception.error.ErrorConstants;
 import ru.veselov.instazoo.exception.error.JwtErrorResponse;
-import ru.veselov.instazoo.model.User;
-import ru.veselov.instazoo.service.CustomUserDetailsService;
+import ru.veselov.instazoo.security.AuthProperties;
+import ru.veselov.instazoo.security.SecurityConstants;
+import ru.veselov.instazoo.security.authentication.JwtAuthenticationToken;
+import ru.veselov.instazoo.security.jwt.JwtValidator;
+import ru.veselov.instazoo.security.managers.JwtAuthenticationManager;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Optional;
 
 @Component
@@ -30,9 +31,7 @@ import java.util.Optional;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtProvider jwtProvider;
-
-    private final CustomUserDetailsService userDetailsService;
+    private final JwtAuthenticationManager authenticationManager;
 
     private final JwtValidator jwtValidator;
 
@@ -51,14 +50,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = jwtOpt.get();
         try {
             if (StringUtils.isNotBlank(jwt) && jwtValidator.validateAccessToken(jwt)) {
-                Long userId = jwtProvider.getUserIdFromToken(jwt);
-                User user = userDetailsService.loadUserById(userId);
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        user, null, Collections.emptyList()
-                );
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                log.info("Authentication set for [user {}]", user.getUsername());
+                JwtAuthenticationToken token = new JwtAuthenticationToken(jwt);
+                Authentication authenticationToken = authenticationManager.authenticate(token);
+                if (authenticationToken.isAuthenticated()) {
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    log.info("Authentication set for [request {}]", request.getRemoteAddr());
+                }
             } else {
                 log.error("Cannot authenticate user with [{}]", jwt);
             }
@@ -83,8 +80,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         JwtErrorResponse jwtErrorResponse = new JwtErrorResponse(
                 ErrorConstants.JWT_EXPIRED,
                 e.getMessage(),
-                "/api/auth/signin",
-                "/api/auth/refresh-token");
+                "/api/auth/v1/signin",
+                "/api/auth/v1/refresh-token");
         String errorMessage = objectMapper.writeValueAsString(jwtErrorResponse);
         response.setContentType(SecurityConstants.CONTENT_TYPE);
         response.setStatus(HttpStatus.BAD_REQUEST.value());
