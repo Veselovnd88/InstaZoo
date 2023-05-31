@@ -1,6 +1,7 @@
 package ru.veselov.instazoo.util;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.veselov.instazoo.dto.CommentDTO;
 import ru.veselov.instazoo.dto.PostDTO;
 import ru.veselov.instazoo.dto.UserDTO;
@@ -28,8 +29,9 @@ public class TestUtils {
 
     public static UserEntity getUserEntity() {
         UserEntity userEntity = new UserEntity();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         userEntity.setUsername(Constants.USERNAME);
-        userEntity.setPassword(Constants.PASSWORD);
+        userEntity.setPassword(encoder.encode(Constants.PASSWORD));
         userEntity.setFirstname(Constants.FIRST_NAME);
         userEntity.setLastname(Constants.LAST_NAME);
         userEntity.setRoles(Set.of(ERole.ROLE_USER, ERole.ROLE_ADMIN));
@@ -44,6 +46,7 @@ public class TestUtils {
         signUpRequest.setLastname(Constants.LAST_NAME);
         signUpRequest.setEmail(Constants.EMAIL);
         signUpRequest.setPassword(Constants.PASSWORD);
+        signUpRequest.setConfirmPassword(Constants.PASSWORD);
         return signUpRequest;
     }
 

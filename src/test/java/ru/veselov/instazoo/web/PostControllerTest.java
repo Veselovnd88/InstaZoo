@@ -129,6 +129,7 @@ class PostControllerTest {
                 .jsonPath("$.id").isEqualTo(post.getId())
                 .jsonPath("$.username").isEqualTo(post.getUsername())
                 .jsonPath("$.caption").isEqualTo(post.getCaption())
+                .jsonPath("$.location").isEqualTo(post.getLocation())
                 .jsonPath("$.createdAt").isEqualTo(
                         post.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-mm-dd HH:mm:ss")))
                 .jsonPath("$.likedUsers").isArray()

@@ -1,6 +1,5 @@
 package ru.veselov.instazoo.exception;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import ru.veselov.instazoo.exception.error.BasicErrorResponse;
 import ru.veselov.instazoo.exception.error.ErrorConstants;
-import ru.veselov.instazoo.exception.error.JwtErrorResponse;
 import ru.veselov.instazoo.exception.error.ValidationErrorResponse;
 
 @RestControllerAdvice
@@ -40,17 +38,6 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public BasicErrorResponse handleEntityNotFoundException(RuntimeException exception) {
         return new BasicErrorResponse(ErrorConstants.ERROR_NOT_FOUND, exception.getMessage());
-    }
-
-    @ExceptionHandler(ExpiredJwtException.class)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public JwtErrorResponse handleJwtExpiredException(RuntimeException exception) {
-        return new JwtErrorResponse(
-                ErrorConstants.JWT_EXPIRED,
-                exception.getMessage(),
-                "/api/auth/signin",
-                "/api/auth/refresh-token");
     }
 
     @ExceptionHandler(ImageProcessingException.class)
