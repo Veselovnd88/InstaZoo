@@ -41,7 +41,7 @@ class PostControllerTest {
     }
 
     @Test
-    void shouldCallPostServiceToCreatePost() {
+    void shouldCreateAndReturnPost() {
         PostDTO postDTO = TestUtils.getPostDTO();
         Post post = TestUtils.getPost();
         Mockito.when(postService.createPost(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(post);
@@ -56,7 +56,7 @@ class PostControllerTest {
     }
 
     @Test
-    void shouldCallPostServiceToGeAllPosts() {
+    void shouldReturnAllPosts() {
         Post post = TestUtils.getPost();
         Mockito.when(postService.getAllPosts()).thenReturn(List.of(
                 post,
@@ -75,7 +75,7 @@ class PostControllerTest {
     }
 
     @Test
-    void shouldCallPostServiceToGetAllPostsForUser() {
+    void shouldReturnAllPostsForUser() {
         Post post = TestUtils.getPost();
         Mockito.when(postService.getAllPostsForUser(ArgumentMatchers.any())).thenReturn(List.of(
                 post,
@@ -93,7 +93,7 @@ class PostControllerTest {
     }
 
     @Test
-    void shouldCallPostServiceToLike() {
+    void shouldLikePostAndReturnPost() {
         String postId = Constants.ANY_ID.toString();
         String username = Constants.USERNAME;
         Post post = TestUtils.getPost();
@@ -110,7 +110,7 @@ class PostControllerTest {
     }
 
     @Test
-    void shouldCallPostServiceToDeletePost() {
+    void shouldDeletePostAndReturnResponseMessage() {
         String postId = Constants.ANY_ID.toString();
 
         webTestClient.delete().uri(uriBuilder -> uriBuilder

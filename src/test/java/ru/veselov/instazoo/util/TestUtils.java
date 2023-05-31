@@ -82,6 +82,7 @@ public class TestUtils {
         postEntity.setTitle(Constants.POST_TITLE);
         postEntity.setId(Constants.ANY_ID);
         postEntity.setLikes(100500);
+        postEntity.setUsername(Constants.USERNAME);
         Set<String> likedUsers = new HashSet<>();
         likedUsers.add("BlackDog");
         likedUsers.add("RedDog");
