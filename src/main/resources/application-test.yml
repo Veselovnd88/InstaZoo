@@ -8,6 +8,8 @@ auth:
   prefix: "Bearer "
   header: "Authorization"
   expiration-time: 600000
+  signin-url: "/api/v1/auth/signin"
+  signup-url: "/api/v1/auth/signup"
 
 spring:
   datasource:
@@ -15,6 +17,7 @@ spring:
     url: jdbc:postgresql://localhost:5436/instazoo
     username: admin
     password: admin
+
   jpa:
     properties:
       hibernate:
@@ -26,7 +29,7 @@ spring:
   flyway:
     baseline-on-migrate: true
     locations: db/migration
-    enabled: false
+    enabled: true
 
 logging:
   level:

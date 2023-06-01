@@ -30,8 +30,13 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         if (jwtValidator.validateAccessToken(jwt)) {
             Long userId = jwtParser.getUserIdFromToken(jwt);
             User user = userDetailsService.loadUserById(userId);
+            authToken.setPrincipal(user);
+            authToken.setAuthenticated(true);
+            JwtAuthenticationToken authenticatedToken =
+                    new JwtAuthenticationToken(user.getAuthorities(), user, true, jwt);
+            authenticatedToken.setDetails(authToken.getDetails());
             log.info("[User {} authenticated]", user.getUsername());
-            return new JwtAuthenticationToken(user.getAuthorities(), user, true, jwt);
+            return authenticatedToken;
         }
         return authentication;
     }

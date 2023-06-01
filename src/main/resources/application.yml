@@ -9,6 +9,10 @@ auth:
   header: "Authorization"
   expiration-time: 600000
   refresh-expiration-time: 18000000
+  signin-url: "/api/v1/auth/signin"
+  signup-url: "/api/v1/auth/signup"
+  refresh-token-url: "/api/v1/auth/refresh-token"
+
 
 spring:
   profiles:

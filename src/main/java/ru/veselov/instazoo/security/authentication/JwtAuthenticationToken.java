@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
+import javax.security.auth.Subject;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -37,6 +38,12 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     @Override
+    public boolean implies(Subject subject) {
+        return super.implies(subject);
+    }
+
+
+    @Override
     public Object getCredentials() {
         return null;
     }
@@ -44,6 +51,11 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     @Override
     public Object getPrincipal() {
         return principal;
+    }
+
+    @Override
+    public void setDetails(Object details) {
+        super.setDetails(details);
     }
 
 }

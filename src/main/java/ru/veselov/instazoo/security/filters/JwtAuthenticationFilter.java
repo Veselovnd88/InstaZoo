@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.veselov.instazoo.exception.error.ErrorConstants;
@@ -51,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (StringUtils.isNotBlank(jwt) && jwtValidator.validateAccessToken(jwt)) {
                 JwtAuthenticationToken token = new JwtAuthenticationToken(jwt);
+                token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 Authentication authenticationToken = authenticationManager.authenticate(token);
                 if (authenticationToken.isAuthenticated()) {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
@@ -80,8 +82,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         JwtErrorResponse jwtErrorResponse = new JwtErrorResponse(
                 ErrorConstants.JWT_EXPIRED,
                 e.getMessage(),
-                "/api/auth/v1/signin",
-                "/api/auth/v1/refresh-token");
+                authProperties.getSigninUrl(),
+                authProperties.getRefreshTokenUrl());
         String errorMessage = objectMapper.writeValueAsString(jwtErrorResponse);
         response.setContentType(SecurityConstants.CONTENT_TYPE);
         response.setStatus(HttpStatus.BAD_REQUEST.value());

@@ -5,9 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -26,10 +28,6 @@ import ru.veselov.instazoo.util.TestUtils;
 
 import java.security.Principal;
 import java.util.Optional;
-
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceImplTest {
@@ -62,13 +60,15 @@ class CommentServiceImplTest {
         CommentDTO commentDTO = TestUtils.getCommentDTO();
         UserEntity userEntity = TestUtils.getUserEntity();
         PostEntity postEntity = TestUtils.getPostEntity();
-        when(principal.getName()).thenReturn(Constants.USERNAME);
-        when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.of(userEntity));
-        when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.of(postEntity));
+        CommentEntity commentEntity = TestUtils.getCommentEntity();
+        Mockito.when(principal.getName()).thenReturn(Constants.USERNAME);
+        Mockito.when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.of(userEntity));
+        Mockito.when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.of(postEntity));
+        Mockito.when(commentRepository.save(ArgumentMatchers.any())).thenReturn(commentEntity);
 
         commentService.saveComment(Constants.ANY_ID, commentDTO, principal);
 
-        verify(commentRepository, times(1)).save(commentCaptor.capture());
+        Mockito.verify(commentRepository, Mockito.times(1)).save(commentCaptor.capture());
         CommentEntity captured = commentCaptor.getValue();
         Assertions.assertThat(captured.getMessage()).isEqualTo(commentDTO.getMessage());
         Assertions.assertThat(captured.getPost()).isEqualTo(postEntity);
@@ -79,28 +79,28 @@ class CommentServiceImplTest {
     @Test
     void shouldGetAllCommentsToPost() {
         PostEntity postEntity = TestUtils.getPostEntity();
-        when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.of(postEntity));
+        Mockito.when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.of(postEntity));
 
         commentService.getAllCommentsForPost(Constants.ANY_ID);
 
-        verify(commentRepository, times(1)).findAllByPost(postEntity);
+        Mockito.verify(commentRepository, Mockito.times(1)).findAllByPost(postEntity);
     }
 
     @Test
     void shouldDeleteComment() {
         CommentEntity commentEntity = TestUtils.getCommentEntity();
-        when(commentRepository.findById(Constants.ANY_ID)).thenReturn(Optional.of(commentEntity));
+        Mockito.when(commentRepository.findById(Constants.ANY_ID)).thenReturn(Optional.of(commentEntity));
 
         commentService.deleteComment(Constants.ANY_ID);
 
-        verify(commentRepository, times(1)).delete(commentEntity);
+        Mockito.verify(commentRepository, Mockito.times(1)).delete(commentEntity);
     }
 
     @Test
     void shouldThrowExceptionIfUsernameNotFound() {
         CommentDTO commentDTO = TestUtils.getCommentDTO();
-        when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.empty());
-        when(principal.getName()).thenReturn(Constants.USERNAME);
+        Mockito.when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.empty());
+        Mockito.when(principal.getName()).thenReturn(Constants.USERNAME);
         Assertions.assertThatThrownBy(() -> commentService.saveComment(Constants.ANY_ID, commentDTO, principal))
                 .isInstanceOf(UsernameNotFoundException.class);
     }
@@ -108,9 +108,9 @@ class CommentServiceImplTest {
     @Test
     void shouldThrowExceptionIfPostNotFound() {
         CommentDTO commentDTO = TestUtils.getCommentDTO();
-        when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.empty());
-        when(principal.getName()).thenReturn(Constants.USERNAME);
-        when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.of(TestUtils.getUserEntity()));
+        Mockito.when(postRepository.findById(Constants.ANY_ID)).thenReturn(Optional.empty());
+        Mockito.when(principal.getName()).thenReturn(Constants.USERNAME);
+        Mockito.when(userRepository.findUserByUsername(Constants.USERNAME)).thenReturn(Optional.of(TestUtils.getUserEntity()));
 
         Assertions.assertThatThrownBy(() -> commentService.saveComment(Constants.ANY_ID, commentDTO, principal))
                 .isInstanceOf(PostNotFoundException.class);

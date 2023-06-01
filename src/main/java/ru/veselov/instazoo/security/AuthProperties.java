@@ -21,4 +21,10 @@ public class AuthProperties {
 
     private Long refreshExpirationTime;
 
+    private String signinUrl;
+
+    private String signupUrl;
+
+    private String refreshTokenUrl;
+
 }

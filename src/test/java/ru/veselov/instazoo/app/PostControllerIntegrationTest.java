@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.instazoo.app.testcontainers.PostgresTestContainersConfig;
 import ru.veselov.instazoo.dto.PostDTO;
@@ -24,6 +26,8 @@ import ru.veselov.instazoo.util.TestUtils;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
+@ActiveProfiles("test")
+@DirtiesContext
 class PostControllerIntegrationTest extends PostgresTestContainersConfig {
 
     @Autowired
@@ -48,16 +52,16 @@ class PostControllerIntegrationTest extends PostgresTestContainersConfig {
     void init() {
         user = TestUtils.getUser();
         UserEntity userEntity = TestUtils.getUserEntity();
-        UserEntity save = userRepository.save(userEntity);
-        user.setId(save.getId());
+        UserEntity saved = userRepository.save(userEntity);
+        user.setId(saved.getId());
         upAuthToken = new UsernamePasswordAuthenticationToken(user, null);
         jwtHeader = Constants.BEARER_PREFIX + jwtGenerator.generateToken(upAuthToken);
     }
 
     @AfterEach
     void deleteAll() {
-        userRepository.deleteAll();
         postRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -113,7 +117,9 @@ class PostControllerIntegrationTest extends PostgresTestContainersConfig {
         PostEntity notUserPostEntity = Instancio.of(PostEntity.class)
                 .ignore(Select.field(PostEntity::getUser))
                 .ignore(Select.field(PostEntity::getId)).create();
-        userPostEntity.setUser(TestUtils.getUserEntity());
+        UserEntity userEntity = TestUtils.getUserEntity();
+        userEntity.setId(user.getId());
+        userPostEntity.setUser(userEntity);
         postRepository.save(userPostEntity);
         postRepository.save(notUserPostEntity);
 
@@ -165,9 +171,11 @@ class PostControllerIntegrationTest extends PostgresTestContainersConfig {
         PostEntity userPostEntity = Instancio.of(PostEntity.class)
                 .ignore(Select.field(PostEntity::getUser))
                 .ignore(Select.field(PostEntity::getId)).create();
-        userPostEntity.setUser(TestUtils.getUserEntity());
-        PostEntity save = postRepository.save(userPostEntity);
-        Long postId = save.getId();
+        UserEntity userEntity = TestUtils.getUserEntity();
+        userEntity.setId(user.getId());
+        userPostEntity.setUser(userEntity);
+        PostEntity saved = postRepository.save(userPostEntity);
+        Long postId = saved.getId();
 
         webTestClient.delete().uri(uriBuilder -> uriBuilder
                         .path(Constants.PREFIX_URL + "post")

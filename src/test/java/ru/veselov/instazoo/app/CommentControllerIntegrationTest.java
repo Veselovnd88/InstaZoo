@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.instazoo.app.testcontainers.PostgresTestContainersConfig;
 import ru.veselov.instazoo.dto.CommentDTO;
@@ -27,6 +29,8 @@ import ru.veselov.instazoo.util.TestUtils;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
+@ActiveProfiles("test")
+@DirtiesContext
 class CommentControllerIntegrationTest extends PostgresTestContainersConfig {
 
     @Autowired
@@ -54,8 +58,8 @@ class CommentControllerIntegrationTest extends PostgresTestContainersConfig {
     void init() {
         user = TestUtils.getUser();
         UserEntity userEntity = TestUtils.getUserEntity();
-        UserEntity save = userRepository.save(userEntity);
-        user.setId(save.getId());
+        UserEntity saved = userRepository.save(userEntity);
+        user.setId(saved.getId());
         upAuthToken = new UsernamePasswordAuthenticationToken(user, null);
         jwtHeader = Constants.BEARER_PREFIX + jwtGenerator.generateToken(upAuthToken);
     }
