@@ -1,6 +1,8 @@
 package ru.veselov.instazoo.app;
 
 import org.hamcrest.Matchers;
+import org.instancio.Instancio;
+import org.instancio.Select;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,9 +62,12 @@ class PostControllerIntegrationTest extends PostgresTestContainersConfig {
 
     @Test
     void shouldCreatePost() {
-        PostDTO postDTO = TestUtils.getPostDTO();
+        PostDTO postDTO = Instancio.of(PostDTO.class)
+                .ignore(Select.field(PostDTO::getId))
+                .create();
 
-        WebTestClient.ResponseSpec created = webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "post").path("/create").build())
+        WebTestClient.ResponseSpec created = webTestClient.post().uri(uriBuilder ->
+                        uriBuilder.path(Constants.PREFIX_URL + "post").path("/create").build())
                 .header(Constants.AUTH_HEADER, jwtHeader)
                 .bodyValue(postDTO)
                 .exchange().expectStatus().isCreated();
@@ -71,26 +76,105 @@ class PostControllerIntegrationTest extends PostgresTestContainersConfig {
 
     @Test
     void shouldReturnAllPosts() {
-        PostEntity postEntity = TestUtils.getPostEntity();
-        PostEntity postEntity2 = TestUtils.getPostEntity();
-        postEntity2.setCaption("AnotherCaption");
-        postEntity2.setUsername("AnotherUser");
-        postEntity2.setId(null);
+        PostEntity postEntity = Instancio.of(PostEntity.class)
+                .ignore(Select.field(PostEntity::getUser))
+                .ignore(Select.field(PostEntity::getId)).create();
+        PostEntity postEntity2 = Instancio.of(PostEntity.class)
+                .ignore(Select.field(PostEntity::getUser))
+                .ignore(Select.field(PostEntity::getId)).create();
         postRepository.save(postEntity);
         postRepository.save(postEntity2);
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "/post").path("/all").build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "post").path("/all").build())
                 .header(Constants.AUTH_HEADER, jwtHeader)
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
+                .jsonPath("$.size()").isEqualTo(2)
                 .jsonPath("$[0].caption").value(Matchers.anyOf(
                         Matchers.containsString(postEntity2.getCaption()),
                         Matchers.containsString(postEntity.getCaption())))
-                .jsonPath("$.size()").isEqualTo(2)
+                .jsonPath("$[1].caption").value(Matchers.anyOf(
+                        Matchers.containsString(postEntity2.getCaption()),
+                        Matchers.containsString(postEntity.getCaption())))
                 .jsonPath("$[0].username").value(Matchers.anyOf(
                         Matchers.containsString(postEntity2.getUsername()),
                         Matchers.containsString(postEntity.getUsername())))
+                .jsonPath("$[1].username").value(Matchers.anyOf(
+                        Matchers.containsString(postEntity2.getUsername()),
+                        Matchers.containsString(postEntity.getUsername())))
                 .jsonPath("$[2]").doesNotExist();//TODO check second element
+    }
+
+    @Test
+    void shouldReturnAllPostsOfCurrentUser() {
+        PostEntity userPostEntity = Instancio.of(PostEntity.class)
+                .ignore(Select.field(PostEntity::getUser))
+                .ignore(Select.field(PostEntity::getId)).create();
+        PostEntity notUserPostEntity = Instancio.of(PostEntity.class)
+                .ignore(Select.field(PostEntity::getUser))
+                .ignore(Select.field(PostEntity::getId)).create();
+        userPostEntity.setUser(TestUtils.getUserEntity());
+        postRepository.save(userPostEntity);
+        postRepository.save(notUserPostEntity);
+
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "post").build())
+                .header(Constants.AUTH_HEADER, jwtHeader)
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").isArray()
+                .jsonPath("$.size()").isEqualTo(1)
+                .jsonPath("$[0].caption").isEqualTo(userPostEntity.getCaption())
+                .jsonPath("$[0].username").isEqualTo(userPostEntity.getUsername())
+                .jsonPath("$[1]").doesNotExist();
+    }
+
+    @Test
+    void shouldLikeAndDislikePost() {
+        String username = user.getUsername();
+        PostEntity userPostEntity = Instancio.of(PostEntity.class)
+                .ignore(Select.field(PostEntity::getUser))
+                .ignore(Select.field(PostEntity::getId)).create();
+        PostEntity save = postRepository.save(userPostEntity);
+        Long postId = save.getId();
+        //user like post
+        webTestClient.post().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "post")
+                        .path("/" + postId.toString())
+                        .path("/" + username)
+                        .path("/like").build())
+                .header(Constants.AUTH_HEADER, jwtHeader)
+                .exchange().expectStatus().isAccepted()
+                .expectBody().jsonPath("$").exists()
+                .jsonPath("$.likedUsers").isArray()
+                .jsonPath("$.likedUsers").value(Matchers.hasItem(username))
+                .jsonPath("$.likes").isEqualTo(userPostEntity.getLikes() + 1);
+        //user dislike post
+        webTestClient.post().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "post")
+                        .path("/" + postId.toString())
+                        .path("/" + username)
+                        .path("/like").build())
+                .header(Constants.AUTH_HEADER, jwtHeader)
+                .exchange().expectStatus().isAccepted()
+                .expectBody().jsonPath("$").exists()
+                .jsonPath("$.likedUsers").isArray()
+                .jsonPath("$.likes").isEqualTo(userPostEntity.getLikes());
+    }
+
+    @Test
+    void shouldDeletePost() {
+        PostEntity userPostEntity = Instancio.of(PostEntity.class)
+                .ignore(Select.field(PostEntity::getUser))
+                .ignore(Select.field(PostEntity::getId)).create();
+        userPostEntity.setUser(TestUtils.getUserEntity());
+        PostEntity save = postRepository.save(userPostEntity);
+        Long postId = save.getId();
+
+        webTestClient.delete().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "post")
+                        .path("/" + postId.toString()).path("/delete").build())
+                .header(Constants.AUTH_HEADER, jwtHeader).exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.message").isEqualTo(String.format("Post %s deleted", postId));
     }
 
     private void checkBody(WebTestClient.ResponseSpec spec, PostDTO post) {
