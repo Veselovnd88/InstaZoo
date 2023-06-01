@@ -112,7 +112,6 @@ public class TestUtils {
 
     public static CommentDTO getCommentDTO() {
         CommentDTO commentDTO = new CommentDTO();
-        commentDTO.setUsername(Constants.USERNAME);
         commentDTO.setMessage(Constants.COMMENT_MESSAGE);
         return commentDTO;
     }

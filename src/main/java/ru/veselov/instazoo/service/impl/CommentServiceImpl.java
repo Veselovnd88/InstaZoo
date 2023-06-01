@@ -45,6 +45,7 @@ public class CommentServiceImpl implements CommentService {
         commentEntity.setUserId(userEntity.getId());
         commentEntity.setUsername(principal.getName());
         CommentEntity saved = commentRepository.save(commentEntity);
+        log.info("[Comment {}] saved", saved.getId());
         return commentMapper.entityToComment(saved);
     }
 
@@ -52,6 +53,7 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> getAllCommentsForPost(Long postId) {
         PostEntity post = getPostById(postId);
         List<CommentEntity> comments = commentRepository.findAllByPost(post);
+        log.info("Retrieved comments for [post {}]", postId);
         return commentMapper.entitiesToComments(comments);
     }
 

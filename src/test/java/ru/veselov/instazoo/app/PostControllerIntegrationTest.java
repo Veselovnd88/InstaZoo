@@ -61,7 +61,7 @@ class PostControllerIntegrationTest extends PostgresTestContainersConfig {
     }
 
     @Test
-    void shouldCreatePost() {
+    void shouldCreatePostAndReturn() {
         PostDTO postDTO = Instancio.of(PostDTO.class)
                 .ignore(Select.field(PostDTO::getId))
                 .create();
