@@ -34,10 +34,9 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(r ->
-                        r.requestMatchers(SecurityConstants.SIGN_UP_URLS, SecurityConstants.ERROR_URL).permitAll()
-                                .anyRequest().authenticated()
-                ).exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
-
+                        r.requestMatchers(SecurityConstants.SIGN_UP_URLS, "/error").permitAll()
+                                .anyRequest().authenticated())
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

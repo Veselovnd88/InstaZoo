@@ -1,7 +1,7 @@
 server:
   port: ${PORT}
   error:
-    path: /api/v1/error
+    include-stacktrace: never
 
 auth:
   secret: ${SECURITY_KEY}

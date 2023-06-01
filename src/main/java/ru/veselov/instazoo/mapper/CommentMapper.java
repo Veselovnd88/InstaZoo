@@ -17,6 +17,8 @@ public interface CommentMapper {
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "post", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "username", ignore = true)
     CommentEntity dtoToEntity(CommentDTO commentDTO);
 
     @Mapping(target = "postId", expression = "java(commentEntity.getPost().getId())")

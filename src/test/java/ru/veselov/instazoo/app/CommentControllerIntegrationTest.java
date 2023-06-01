@@ -8,12 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import ru.veselov.instazoo.app.testcontainers.PostgresTestContainersConfig;
 import ru.veselov.instazoo.dto.CommentDTO;
 import ru.veselov.instazoo.entity.CommentEntity;
 import ru.veselov.instazoo.entity.PostEntity;
 import ru.veselov.instazoo.entity.UserEntity;
+import ru.veselov.instazoo.exception.error.ErrorConstants;
 import ru.veselov.instazoo.model.User;
 import ru.veselov.instazoo.repository.CommentRepository;
 import ru.veselov.instazoo.repository.PostRepository;
@@ -24,7 +27,7 @@ import ru.veselov.instazoo.util.TestUtils;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-class CommentControllerIntegrationTest {
+class CommentControllerIntegrationTest extends PostgresTestContainersConfig {
 
     @Autowired
     WebTestClient webTestClient;
@@ -143,8 +146,29 @@ class CommentControllerIntegrationTest {
                         .path("/" + postId.toString())
                         .build())
                 .header(Constants.AUTH_HEADER, jwtHeader)
-                .exchange().expectStatus().isOk();
+                .exchange().expectStatus().isOk()
+                .expectBodyList(CommentEntity.class).hasSize(0);
     }
 
+    @Test
+    void shouldReturnNotAuthorizedError() {
+        webTestClient.post().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "comment")
+                        .build())
+                .exchange().expectStatus().isEqualTo(HttpStatus.UNAUTHORIZED)
+                .expectBody().jsonPath("$.error").isEqualTo(ErrorConstants.ERROR_NOT_AUTHORIZED);
+
+        webTestClient.get().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "comment")
+                        .build())
+                .exchange().expectStatus().isEqualTo(HttpStatus.UNAUTHORIZED)
+                .expectBody().jsonPath("$.error").isEqualTo(ErrorConstants.ERROR_NOT_AUTHORIZED);
+
+        webTestClient.delete().uri(uriBuilder -> uriBuilder
+                        .path(Constants.PREFIX_URL + "comment")
+                        .build())
+                .exchange().expectStatus().isEqualTo(HttpStatus.UNAUTHORIZED)
+                .expectBody().jsonPath("$.error").isEqualTo(ErrorConstants.ERROR_NOT_AUTHORIZED);
+    }
 
 }

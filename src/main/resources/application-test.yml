@@ -1,7 +1,7 @@
 server:
   port: 6666
   error:
-    path: /api/v1/error
+    include-stacktrace: never
 
 auth:
   secret: "D9D323C5E55F45C206D7880329B1721A4334C00F336E5F2F1E9DAB745FF44837"

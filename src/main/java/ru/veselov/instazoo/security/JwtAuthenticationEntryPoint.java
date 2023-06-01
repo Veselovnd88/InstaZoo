@@ -23,12 +23,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException {
         BasicErrorResponse basicErrorResponse = new BasicErrorResponse(
                 ErrorConstants.ERROR_NOT_AUTHORIZED,
-                "Invalid login, password or token");
+                "You're not authorized to this action, check your credentials or path");
         String jsonLoginResponse = new Gson().toJson(basicErrorResponse);
         response.setContentType(SecurityConstants.CONTENT_TYPE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().println(jsonLoginResponse);
-        log.error("Invalid credentials data");
+        log.error("Error occurred during authentication");
     }
 
 }
