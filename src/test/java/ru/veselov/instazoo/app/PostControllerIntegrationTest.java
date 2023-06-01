@@ -102,7 +102,7 @@ class PostControllerIntegrationTest extends PostgresTestContainersConfig {
                 .jsonPath("$[1].username").value(Matchers.anyOf(
                         Matchers.containsString(postEntity2.getUsername()),
                         Matchers.containsString(postEntity.getUsername())))
-                .jsonPath("$[2]").doesNotExist();//TODO check second element
+                .jsonPath("$[2]").doesNotExist();
     }
 
     @Test

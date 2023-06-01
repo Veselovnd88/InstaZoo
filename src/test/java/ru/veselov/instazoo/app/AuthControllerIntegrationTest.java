@@ -5,25 +5,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.instazoo.app.testcontainers.PostgresTestContainersConfig;
 import ru.veselov.instazoo.entity.UserEntity;
 import ru.veselov.instazoo.exception.error.ErrorConstants;
 import ru.veselov.instazoo.payload.request.LoginRequest;
+import ru.veselov.instazoo.payload.request.RefreshTokenRequest;
 import ru.veselov.instazoo.payload.request.SignUpRequest;
 import ru.veselov.instazoo.repository.UserRepository;
+import ru.veselov.instazoo.security.jwt.JwtGenerator;
 import ru.veselov.instazoo.util.Constants;
 import ru.veselov.instazoo.util.TestUtils;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-public class AuthControllerIntegrationTest extends PostgresTestContainersConfig {
+class AuthControllerIntegrationTest extends PostgresTestContainersConfig {
 
     @Autowired
     WebTestClient webTestClient;
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    JwtGenerator jwtGenerator;
 
     @Test
     void shouldCreateUser() {
@@ -78,6 +84,24 @@ public class AuthControllerIntegrationTest extends PostgresTestContainersConfig 
                 .jsonPath("$.refreshToken").isNotEmpty();
 
         userRepository.deleteAll();
+    }
+
+    @Test
+    void shouldReturnUpdatedAuthResponseAfterRefreshToken() {
+        UserEntity userEntity = TestUtils.getUserEntity();
+        userRepository.save(userEntity);
+        String refreshToken = jwtGenerator
+                .generateRefreshToken(new UsernamePasswordAuthenticationToken(TestUtils.getUser(), null));
+        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(refreshToken);
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(Constants.PREFIX_URL + "auth")
+                        .path("/refresh-token")
+                        .build())
+                .bodyValue(refreshTokenRequest)
+                .exchange().expectStatus().isAccepted()
+                .expectBody().jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.token").isNotEmpty()
+                .jsonPath("$.refreshToken").isNotEmpty();
     }
 
     @Test
