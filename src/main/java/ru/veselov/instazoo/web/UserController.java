@@ -22,7 +22,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class UserController {
 
