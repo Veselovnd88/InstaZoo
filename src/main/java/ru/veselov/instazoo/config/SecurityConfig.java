@@ -1,4 +1,4 @@
-package ru.veselov.instazoo.security;
+package ru.veselov.instazoo.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import ru.veselov.instazoo.security.JwtAuthenticationEntryPoint;
+import ru.veselov.instazoo.security.SecurityConstants;
 import ru.veselov.instazoo.security.filters.JwtAuthenticationFilter;
 import ru.veselov.instazoo.service.CustomUserDetailsService;
 

@@ -1,4 +1,4 @@
-package ru.veselov.instazoo.web;
+package ru.veselov.instazoo.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

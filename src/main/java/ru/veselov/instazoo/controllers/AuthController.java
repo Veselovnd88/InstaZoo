@@ -1,4 +1,4 @@
-package ru.veselov.instazoo.web;
+package ru.veselov.instazoo.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

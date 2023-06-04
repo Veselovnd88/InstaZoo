@@ -1,4 +1,4 @@
-package ru.veselov.instazoo.web;
+package ru.veselov.instazoo.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
