@@ -68,10 +68,11 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
+    //TODO should be configured more accurate
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
         //the below three lines will add the relevant CORS response headers
         configuration.addAllowedOrigin("*");
