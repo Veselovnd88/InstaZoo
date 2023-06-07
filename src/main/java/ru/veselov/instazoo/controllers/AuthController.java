@@ -3,7 +3,6 @@ package ru.veselov.instazoo.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +23,6 @@ import ru.veselov.instazoo.validation.FieldErrorResponseService;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/auth")
-@PreAuthorize("permitAll")
 @RequiredArgsConstructor
 public class AuthController {
 
