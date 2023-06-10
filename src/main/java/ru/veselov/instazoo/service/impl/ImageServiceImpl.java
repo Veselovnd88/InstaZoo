@@ -115,8 +115,9 @@ public class ImageServiceImpl implements ImageService {
     private static byte[] compressBytes(byte[] data) {
         Deflater deflater = new Deflater();
         deflater.setInput(data);
-        deflater.finish();
         ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length);
+        deflater.finish();
+
         byte[] buffer = new byte[1024];
         while (!deflater.finished()) {
             int count = deflater.deflate(buffer);
@@ -139,7 +140,7 @@ public class ImageServiceImpl implements ImageService {
         byte[] buffer = new byte[1024];
         try {
             while (!inflater.finished()) {
-                int count = inflater.inflate(data);
+                int count = inflater.inflate(buffer);
                 baos.write(buffer, 0, count);
             }
         } catch (DataFormatException e) {
