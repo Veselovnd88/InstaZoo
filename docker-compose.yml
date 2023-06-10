@@ -7,9 +7,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "6666:6666"
+      - "6060:6060"
     environment:
-      - PORT=6666
+      - PORT=6060
       - DATASOURCE_URL=jdbc:postgresql://database_zoo:5432/instazoo
       - SECURITY_KEY=D9D323C5E55F45C206D7880329B1721A4334C00F336E5F2F1E9DAB745FF44837
       - DB_NAME=admin
