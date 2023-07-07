@@ -31,6 +31,18 @@ spring:
     locations: db/migration
     enabled: false
 
+cors:
+  allowed-origins:
+    - "http://localhost:4200"
+
+  allowed-methods:
+    - GET
+    - POST
+    - PUT
+
+  allowed-headers:
+    - "*"
+
 logging:
   level:
     org.springframework.security: DEBUG

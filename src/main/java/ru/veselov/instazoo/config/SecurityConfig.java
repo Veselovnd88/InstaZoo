@@ -15,13 +15,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import ru.veselov.instazoo.security.CorsProperties;
 import ru.veselov.instazoo.security.JwtAuthenticationEntryPoint;
 import ru.veselov.instazoo.security.SecurityConstants;
 import ru.veselov.instazoo.security.filters.JwtAuthenticationFilter;
 import ru.veselov.instazoo.service.CustomUserDetailsService;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,6 +28,8 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     private final CustomUserDetailsService customUserDetailsService;
+
+    private final CorsProperties corsProperties;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -68,16 +68,12 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    //TODO should be configured more accurate
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
-        //the below three lines will add the relevant CORS response headers
-        configuration.addAllowedOrigin("*");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
+        configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
+        configuration.setAllowedMethods(corsProperties.getAllowedMethods());
+        configuration.setAllowedHeaders(corsProperties.getAllowedHeaders());
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
