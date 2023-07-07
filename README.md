@@ -2,7 +2,7 @@
 
 Training project inspired by InstaZoo examples;
 
-Backend Service for Insta Zoo Application;
+Backend Service for Insta Zoo Application; 
 We can start it using docker compose.
 
 <b> "docker-compose up" </b> will build and start Spring backend service on port 6060,
