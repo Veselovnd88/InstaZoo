@@ -24,6 +24,8 @@ Used:
 
 Tested:
 ![image](https://github.com/Veselovnd88/InstaZoo/assets/63257041/86d27cb9-4358-46c2-946d-63e4bf7ef1ef)
+![image](https://github.com/Veselovnd88/InstaZoo/assets/63257041/02e85732-f257-4dc0-ac32-6f6251a12a5d)
+
 
 Angular frontend here:
 https://github.com/Veselovnd88/instazooFrontApp
