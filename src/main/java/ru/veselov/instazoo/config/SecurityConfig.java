@@ -43,6 +43,8 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(r ->
                         r.requestMatchers(SecurityConstants.SIGN_UP_URLS, "/error").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
                                 .anyRequest().authenticated())
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 

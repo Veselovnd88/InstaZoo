@@ -1,10 +1,14 @@
 package ru.veselov.instazoo.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +24,6 @@ import ru.veselov.instazoo.service.RefreshTokenService;
 import ru.veselov.instazoo.service.UserService;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -34,9 +37,15 @@ public class AuthController {
 
     private final RefreshTokenService refreshTokenService;
 
+    @Operation(summary = "Sign in with your login and password", description = "Return response with Jwt")
+    @ApiResponse(responseCode = "202", description = "Successfully authenticated",
+            content = @Content(schema = @Schema(implementation = AuthResponse.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/signin")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public AuthResponse authenticateUser(@Valid @RequestBody LoginRequest login, BindingResult result) {
+    public AuthResponse authenticateUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(content =
+    @Content(schema = @Schema(implementation = LoginRequest.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
+                                         @Valid @RequestBody LoginRequest login, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
         return authenticationService.authenticate(login);
     }

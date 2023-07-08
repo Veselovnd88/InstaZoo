@@ -2,7 +2,13 @@ package ru.veselov.instazoo.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.instazoo.model.ImageModel;
 import ru.veselov.instazoo.payload.response.ResponseMessage;
@@ -11,7 +17,6 @@ import ru.veselov.instazoo.service.ImageService;
 import java.security.Principal;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/v1/image")
 @RequiredArgsConstructor
 public class ImageController {
