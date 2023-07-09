@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RefreshTokenRequest {
 
-    @Schema(description = "Refresh token", example = "")
+    @Schema(description = "Refresh token", example = "jwt")
     @NotEmpty(message = "Refresh token cannot be null")
     private String refreshToken;
 

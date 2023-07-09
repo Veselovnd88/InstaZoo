@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class LoginRequest {
 
-    @Schema(description = "Login: username", example = "Vasya")
+    @Schema(description = "Login: username", example = "Black Dog")
     @NotEmpty(message = "Username cannot be empty")
     private String username;
 
