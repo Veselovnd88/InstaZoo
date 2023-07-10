@@ -27,8 +27,10 @@ public class OpenApiConfiguration {
 
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                .description("Bearer jwt authentication")
                 .bearerFormat("Jwt")
-                .scheme("Bearer");
+                .scheme("Bearer")
+                .in(SecurityScheme.In.HEADER);
     }
 
 }

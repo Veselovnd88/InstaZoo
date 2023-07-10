@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,6 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/v1/image")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "Image controller", description = "API for managing images")
 public class ImageController {
 

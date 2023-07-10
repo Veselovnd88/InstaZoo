@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "User controller", description = "API for managing users")
 public class UserController {
 
@@ -42,8 +40,9 @@ public class UserController {
     private final UserMapper userMapper;
 
     @Operation(summary = "Get current user", description = "Returns current user info")
-    @ApiResponse(responseCode = "200", description = "Success", content =
-    @Content(schema = @Schema(implementation = UserDTO.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "200", description = "Success",
+            content = @Content(schema = @Schema(implementation = UserDTO.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @GetMapping()
     public UserDTO getCurrentUser(Principal principal) {
         User currentUser = userService.getCurrentUser(principal);
@@ -51,8 +50,9 @@ public class UserController {
     }
 
     @Operation(summary = "Get user info my Id", description = "Returns requested user's info")
-    @ApiResponse(responseCode = "200", description = "Success", content =
-    @Content(schema = @Schema(implementation = UserDTO.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "200", description = "Success",
+            content = @Content(schema = @Schema(implementation = UserDTO.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @GetMapping("/{userId}")
     public UserDTO getUserProfile(@Parameter(in = ParameterIn.PATH, description = "User's id", example = "1")
                                   @PathVariable("userId") String userId) {
@@ -61,8 +61,9 @@ public class UserController {
     }
 
     @Operation(summary = "Update user information", description = "Update user and return updated info")
-    @ApiResponse(responseCode = "202", description = "Successfully updated", content =
-    @Content(schema = @Schema(implementation = UserDTO.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "202", description = "Successfully updated",
+            content = @Content(schema = @Schema(implementation = UserDTO.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PutMapping("/update")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public UserDTO updateUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(content =

@@ -45,8 +45,9 @@ public class AuthController {
                     mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/signin")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public AuthResponse authenticateUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(content =
-    @Content(schema = @Schema(implementation = LoginRequest.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    public AuthResponse authenticateUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(schema = @Schema(implementation = LoginRequest.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
                                          @Valid @RequestBody LoginRequest login, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
         return authenticationService.authenticate(login);
@@ -58,10 +59,10 @@ public class AuthController {
                     mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseMessage registerUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(content =
-    @Content(schema = @Schema(implementation = SignUpRequest.class),
-            mediaType = MediaType.APPLICATION_JSON_VALUE
-    ))
+    public ResponseMessage registerUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(schema = @Schema(implementation = SignUpRequest.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE
+            ))
                                         @Valid @RequestBody SignUpRequest signUp, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
         userService.createUser(signUp);
@@ -69,15 +70,15 @@ public class AuthController {
     }
 
     @Operation(summary = "Refresh access token after sending refresh token", description = "Return updated tokens")
-    @ApiResponse(responseCode = "202", description = "Successfully accepted", content =
-    @Content(schema = @Schema(implementation = AuthResponse.class),
-            mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "202", description = "Successfully accepted",
+            content = @Content(schema = @Schema(implementation = AuthResponse.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/refresh-token")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public AuthResponse refreshToken(@io.swagger.v3.oas.annotations.parameters.RequestBody(content =
-    @Content(schema = @Schema(implementation = RefreshTokenRequest.class),
-            mediaType = MediaType.APPLICATION_JSON_VALUE
-    ))
+    public AuthResponse refreshToken(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(schema = @Schema(implementation = RefreshTokenRequest.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE
+            ))
                                      @Valid @RequestBody RefreshTokenRequest refreshToken, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
         return refreshTokenService.processRefreshToken(refreshToken.getRefreshToken());

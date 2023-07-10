@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "Post controller", description = "API for managing posts")
 public class PostController {
 
@@ -43,8 +41,9 @@ public class PostController {
     private final FieldErrorResponseService fieldErrorResponseService;
 
     @Operation(summary = "Create post", description = "Create and return post")
-    @ApiResponse(responseCode = "201", description = "Successfully created", content =
-    @Content(schema = @Schema(implementation = Post.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "201", description = "Successfully created",
+            content = @Content(schema = @Schema(implementation = Post.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public Post createPost(@io.swagger.v3.oas.annotations.parameters.RequestBody(content =
@@ -57,24 +56,27 @@ public class PostController {
     }
 
     @Operation(summary = "Get all posts of all users", description = "Return array of posts")
-    @ApiResponse(responseCode = "200", description = "Success", content =
-    @Content(array = @ArraySchema(schema = @Schema(implementation = Post.class)), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "200", description = "Success",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Post.class)),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @GetMapping("/all")
     public List<Post> getAllPosts() {
         return postService.getAllPosts();
     }
 
     @Operation(summary = "Get all posts of current user", description = "Return array of posts")
-    @ApiResponse(responseCode = "200", description = "Success", content =
-    @Content(array = @ArraySchema(schema = @Schema(implementation = Post.class)), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "200", description = "Success",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Post.class)),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @GetMapping
     public List<Post> getAllPostsForUser(Principal principal) {
         return postService.getAllPostsForUser(principal);
     }
 
     @Operation(summary = "Like or dislike post", description = "Return updated post info")
-    @ApiResponse(responseCode = "200", description = "Success", content =
-    @Content(schema = @Schema(implementation = Post.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "200", description = "Success",
+            content = @Content(schema = @Schema(implementation = Post.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/{postId}/{username}/like")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Post likePost(@Parameter(in = ParameterIn.PATH, description = "Post id")
@@ -85,8 +87,9 @@ public class PostController {
     }
 
     @Operation(summary = "Delete post", description = "Delete post, returns info message")
-    @ApiResponse(responseCode = "200", description = "Successfully deleted", content =
-    @Content(schema = @Schema(implementation = ResponseMessage.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
+    @ApiResponse(responseCode = "200", description = "Successfully deleted",
+            content = @Content(schema = @Schema(implementation = ResponseMessage.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @DeleteMapping("/{postId}/delete")
     public ResponseMessage deletePost(@Parameter(in = ParameterIn.PATH, description = "Post id to delete")
                                       @PathVariable("postId") String postId, Principal principal) {
