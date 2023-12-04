@@ -1,10 +1,15 @@
 package ru.veselov.instazoo.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +25,10 @@ import ru.veselov.instazoo.service.RefreshTokenService;
 import ru.veselov.instazoo.service.UserService;
 import ru.veselov.instazoo.validation.FieldErrorResponseService;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication controller", description = "API for registration and signing in")
 public class AuthController {
 
     private final AuthenticationService authenticationService;
@@ -34,24 +39,47 @@ public class AuthController {
 
     private final RefreshTokenService refreshTokenService;
 
+    @Operation(summary = "Sign in with your login and password", description = "Return response with Jwt")
+    @ApiResponse(responseCode = "202", description = "Successfully authenticated",
+            content = @Content(schema = @Schema(implementation = AuthResponse.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/signin")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public AuthResponse authenticateUser(@Valid @RequestBody LoginRequest login, BindingResult result) {
+    public AuthResponse authenticateUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(schema = @Schema(implementation = LoginRequest.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
+                                         @Valid @RequestBody LoginRequest login, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
         return authenticationService.authenticate(login);
     }
 
+    @Operation(summary = "Registration of user", description = "Register user and confirmation message")
+    @ApiResponse(responseCode = "201", description = "Successfully registered",
+            content = @Content(schema = @Schema(implementation = ResponseMessage.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseMessage registerUser(@Valid @RequestBody SignUpRequest signUp, BindingResult result) {
+    public ResponseMessage registerUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(schema = @Schema(implementation = SignUpRequest.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE
+            ))
+                                        @Valid @RequestBody SignUpRequest signUp, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
         userService.createUser(signUp);
         return new ResponseMessage("User successfully registered");
     }
 
+    @Operation(summary = "Refresh access token after sending refresh token", description = "Return updated tokens")
+    @ApiResponse(responseCode = "202", description = "Successfully accepted",
+            content = @Content(schema = @Schema(implementation = AuthResponse.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping("/refresh-token")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public AuthResponse refreshToken(@Valid @RequestBody RefreshTokenRequest refreshToken, BindingResult result) {
+    public AuthResponse refreshToken(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(schema = @Schema(implementation = RefreshTokenRequest.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE
+            ))
+                                     @Valid @RequestBody RefreshTokenRequest refreshToken, BindingResult result) {
         fieldErrorResponseService.validateFields(result);
         return refreshTokenService.processRefreshToken(refreshToken.getRefreshToken());
     }

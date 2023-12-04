@@ -1,11 +1,11 @@
 package ru.veselov.instazoo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.minidev.json.annotate.JsonIgnore;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
